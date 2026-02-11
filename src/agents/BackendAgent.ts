@@ -25,6 +25,7 @@ import {
   Timestamp,
 } from 'firebase/firestore';
 import { db } from './CloudAgent';
+import { parsePrice } from '../utils/price';
 import type {
   Chamber,
   ChamberProduct,
@@ -127,14 +128,18 @@ function tiersToProducts(
   chamberId: string,
 ): ChamberProduct[] {
   return Object.entries(tiers)
-    .filter(([, value]) => typeof value === 'number')
-    .map(([tierName, price]) => ({
+    .map(([tierName, val]) => {
+      const price = typeof val === 'number' ? val : parsePrice(String(val));
+      return { tierName, price };
+    })
+    .filter(({ price }) => price > 0)
+    .map(({ tierName, price }) => ({
       id: `${chamberId}_tier_${tierName}`,
       chamberId,
       name: tierName.charAt(0).toUpperCase() + tierName.slice(1),
       description: `${tierName.charAt(0).toUpperCase() + tierName.slice(1)} tier membership`,
       pricingType: 'Fixed' as const,
-      price: price as number,
+      price,
       benefits: [],
     }));
 }
@@ -234,8 +239,11 @@ class BackendAgent {
       snapshot.forEach(docSnap => {
         const chamber = mapDocToChamber(docSnap);
         if (chamber) {
-          // Additional client-side filter for industry tag if provided
-          if (industryTag && !chamber.industryTags.includes(industryTag)) return;
+          // Additional client-side filter for industry tag if provided (case-insensitive)
+          if (industryTag) {
+            const match = chamber.industryTags.some(t => t.toLowerCase() === industryTag.toLowerCase());
+            if (!match) return;
+          }
           results.push(chamber);
         }
       });

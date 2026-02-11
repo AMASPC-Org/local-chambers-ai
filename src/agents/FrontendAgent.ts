@@ -14,7 +14,7 @@ import { QueryDocumentSnapshot, DocumentData } from 'firebase/firestore';
  * Hook to fetch and manage a list of organizations with pagination
  */
 export function useOrganizations(pageSize: number = 10) {
-  const [organizations, setChambers] = useState<Chamber[]>([]);
+  const [chambers, setChambers] = useState<Chamber[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<Error | null>(null);
   const [lastDoc, setLastDoc] = useState<QueryDocumentSnapshot<DocumentData> | undefined>(undefined);
@@ -57,7 +57,7 @@ export function useOrganizations(pageSize: number = 10) {
     fetchChambers(false);
   };
 
-  return { organizations, loading, error, hasMore, loadMore, refresh };
+  return { chambers, loading, error, hasMore, loadMore, refresh, organizations: chambers };
 }
 
 /**
