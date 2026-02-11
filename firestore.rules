@@ -1,0 +1,34 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Organizations: public read, no anonymous write
+    match /organizations/{orgId} {
+      allow read: if true;
+      allow write: if request.auth != null;
+      // Products subcollection: public read, auth write
+      match /products/{productId} {
+        allow read: if true;
+        allow write: if request.auth != null;
+      }
+    }
+    // Leads: anyone can create (prospective members), only auth users read
+    match /leads/{leadId} {
+      allow create: if true;
+      allow read, update, delete: if request.auth != null;
+    }
+    // Users profile docs: owner only
+    match /users/{userId} {
+      allow read, write: if request.auth != null && request.auth.uid == userId;
+    }
+    // Venues: READ ONLY — this collection may belong to a different app
+    // sharing the same Firebase project. Lock it down.
+    match /venues/{venueId} {
+      allow read: if true;
+      allow write: if false;
+    }
+    // Default deny everything else
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}

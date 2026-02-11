@@ -1,0 +1,5 @@
+{
+  "name": "localchambers.ai",
+  "description": "A directory and membership platform for local chambers of commerce featuring provisional access and invoice generation logic.",
+  "requestFramePermissions": []
+}

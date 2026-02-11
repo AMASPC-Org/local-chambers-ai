@@ -1,0 +1,278 @@
+﻿=== Cloud Agent: Seeding organizations ===
+Project: localchambersai
+  Attempting to seed: Bellingham Regional Chamber of Commerce...
+npx : [2026-02-11T21:
+51:55.279Z]  
+@firebase/firestore: 
+Firestore (12.9.0): 
+GrpcConnection RPC 
+'Write' stream 
+0x6135e514 error. 
+Code: 7 Message: 7 
+PERMISSION_DENIED: 
+Cloud Firestore API 
+has not been used in 
+project 
+localchambersai 
+before or it is 
+disabled. Enable it 
+by visiting https://c
+onsole.developers.goo
+gle.com/apis/api/fire
+store.googleapis.com/
+overview?project=loca
+lchambersai then 
+retry. If you 
+enabled this API 
+recently, wait a few 
+minutes for the 
+action to propagate 
+to our systems and 
+retry.
+At line:1 char:1
++ npx tsx scripts/see
+d-organizations.ts 
+2>&1 | Out-File 
+-FilePath scrip ...
++ ~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~
+~~
+    + CategoryInfo   
+           : NotSpe  
+  cified: ([2026-0   
+ 2-11T21:...tems     
+and retry.:Strin    
+g) [], RemoteExc    
+eption
+    + FullyQualified 
+   ErrorId : Native  
+  CommandError
+ 
+[2026-02-11T21:51:55.
+375Z]  
+@firebase/firestore: 
+Firestore (12.9.0): 
+GrpcConnection RPC 
+'Write' stream 
+0x6135e515 error. 
+Code: 7 Message: 7 
+PERMISSION_DENIED: 
+Cloud Firestore API 
+has not been used in 
+project 
+localchambersai 
+before or it is 
+disabled. Enable it 
+by visiting https://c
+onsole.developers.goo
+gle.com/apis/api/fire
+store.googleapis.com/
+overview?project=loca
+lchambersai then 
+retry. If you 
+enabled this API 
+recently, wait a few 
+minutes for the 
+action to propagate 
+to our systems and 
+retry.
+[2026-02-11T21:51:56.
+804Z]  
+@firebase/firestore: 
+Firestore (12.9.0): 
+GrpcConnection RPC 
+'Write' stream 
+0x6135e516 error. 
+Code: 7 Message: 7 
+PERMISSION_DENIED: 
+Cloud Firestore API 
+has not been used in 
+project 
+localchambersai 
+before or it is 
+disabled. Enable it 
+by visiting https://c
+onsole.developers.goo
+gle.com/apis/api/fire
+store.googleapis.com/
+overview?project=loca
+lchambersai then 
+retry. If you 
+enabled this API 
+recently, wait a few 
+minutes for the 
+action to propagate 
+to our systems and 
+retry.
+[2026-02-11T21:51:58.
+836Z]  
+@firebase/firestore: 
+Firestore (12.9.0): 
+GrpcConnection RPC 
+'Write' stream 
+0x6135e517 error. 
+Code: 7 Message: 7 
+PERMISSION_DENIED: 
+Cloud Firestore API 
+has not been used in 
+project 
+localchambersai 
+before or it is 
+disabled. Enable it 
+by visiting https://c
+onsole.developers.goo
+gle.com/apis/api/fire
+store.googleapis.com/
+overview?project=loca
+lchambersai then 
+retry. If you 
+enabled this API 
+recently, wait a few 
+minutes for the 
+action to propagate 
+to our systems and 
+retry.
+[2026-02-11T21:52:00.
+596Z]  
+@firebase/firestore: 
+Firestore (12.9.0): 
+GrpcConnection RPC 
+'Write' stream 
+0x6135e518 error. 
+Code: 7 Message: 7 
+PERMISSION_DENIED: 
+Cloud Firestore API 
+has not been used in 
+project 
+localchambersai 
+before or it is 
+disabled. Enable it 
+by visiting https://c
+onsole.developers.goo
+gle.com/apis/api/fire
+store.googleapis.com/
+overview?project=loca
+lchambersai then 
+retry. If you 
+enabled this API 
+recently, wait a few 
+minutes for the 
+action to propagate 
+to our systems and 
+retry.
+[2026-02-11T21:52:02.
+615Z]  
+@firebase/firestore: 
+Firestore (12.9.0): 
+GrpcConnection RPC 
+'Write' stream 
+0x6135e519 error. 
+Code: 7 Message: 7 
+PERMISSION_DENIED: 
+Cloud Firestore API 
+has not been used in 
+project 
+localchambersai 
+before or it is 
+disabled. Enable it 
+by visiting https://c
+onsole.developers.goo
+gle.com/apis/api/fire
+store.googleapis.com/
+overview?project=loca
+lchambersai then 
+retry. If you 
+enabled this API 
+recently, wait a few 
+minutes for the 
+action to propagate 
+to our systems and 
+retry.
+[2026-02-11T21:52:06.
+051Z]  
+@firebase/firestore: 
+Firestore (12.9.0): 
+GrpcConnection RPC 
+'Write' stream 
+0x6135e51a error. 
+Code: 7 Message: 7 
+PERMISSION_DENIED: 
+Cloud Firestore API 
+has not been used in 
+project 
+localchambersai 
+before or it is 
+disabled. Enable it 
+by visiting https://c
+onsole.developers.goo
+gle.com/apis/api/fire
+store.googleapis.com/
+overview?project=loca
+lchambersai then 
+retry. If you 
+enabled this API 
+recently, wait a few 
+minutes for the 
+action to propagate 
+to our systems and 
+retry.
+[2026-02-11T21:52:12.
+622Z]  
+@firebase/firestore: 
+Firestore (12.9.0): 
+GrpcConnection RPC 
+'Write' stream 
+0x6135e51b error. 
+Code: 7 Message: 7 
+PERMISSION_DENIED: 
+Cloud Firestore API 
+has not been used in 
+project 
+localchambersai 
+before or it is 
+disabled. Enable it 
+by visiting https://c
+onsole.developers.goo
+gle.com/apis/api/fire
+store.googleapis.com/
+overview?project=loca
+lchambersai then 
+retry. If you 
+enabled this API 
+recently, wait a few 
+minutes for the 
+action to propagate 
+to our systems and 
+retry.
+[2026-02-11T21:52:21.
+055Z]  
+@firebase/firestore: 
+Firestore (12.9.0): 
+GrpcConnection RPC 
+'Write' stream 
+0x6135e51c error. 
+Code: 7 Message: 7 
+PERMISSION_DENIED: 
+Cloud Firestore API 
+has not been used in 
+project 
+localchambersai 
+before or it is 
+disabled. Enable it 
+by visiting https://c
+onsole.developers.goo
+gle.com/apis/api/fire
+store.googleapis.com/
+overview?project=loca
+lchambersai then 
+retry. If you 
+enabled this API 
+recently, wait a few 
+minutes for the 
+action to propagate 
+to our systems and 
+retry.
+
+Γ¥î Error: Script 
+timed out after 45 
+seconds.

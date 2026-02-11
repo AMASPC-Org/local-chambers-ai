@@ -1,0 +1,5 @@
+﻿components/ErrorBoundary.tsx(29,3): error TS2578: Unused '@ts-expect-error' directive.
+components/ErrorBoundary.tsx(45,18): error TS2339: Property 'props' does not exist on type 'EB'.
+components/ErrorBoundary.tsx(45,46): error TS2339: Property 'props' does not exist on type 'EB'.
+components/ErrorBoundary.tsx(72,43): error TS2339: Property 'setState' does not exist on type 'EB'.
+components/ErrorBoundary.tsx(96,19): error TS2339: Property 'props' does not exist on type 'EB'.

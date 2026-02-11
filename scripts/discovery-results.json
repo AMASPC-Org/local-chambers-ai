@@ -1,0 +1,281 @@
+{
+  "projectId": "ama-ecosystem-prod",
+  "timestamp": "2026-02-11T18:59:31.046Z",
+  "results": [
+    {
+      "name": "organizations",
+      "status": "found",
+      "docCount": 1,
+      "sampleDocId": "anacortes-chamber-of-commerce",
+      "fields": [
+        "founded_year",
+        "executive",
+        "board_size",
+        "state",
+        "address",
+        "services",
+        "member_count",
+        "org_name",
+        "source_type",
+        "zip_codes",
+        "city",
+        "imported_at",
+        "advocacy_priorities",
+        "data_quality",
+        "key_events",
+        "board_chair",
+        "staff_count",
+        "org_type",
+        "office_hours",
+        "website",
+        "google_doc_source",
+        "region",
+        "email",
+        "membership_tiers",
+        "regional_alliances",
+        "phone"
+      ],
+      "sampleData": {
+        "founded_year": null,
+        "executive": {
+          "title": "President/CEO",
+          "since_year": 2015,
+          "name": "Jesica Kiser"
+        },
+        "board_size": 10,
+        "state": "WA",
+        "address": "819 Commercial Avenue, Suite F, Anacortes, WA",
+        "services": [
+          "Online business directory (~1M page views/year)",
+          "Visitor Information Center (VIC) brochure display",
+          "Experience Anacortes destination marketing",
+          "Vehicle and vessel licensing subagency",
+          "Hot Deals and job vacancy postings",
+          "Government Affairs Committee advocacy",
+          "Membership 101 orientations"
+        ],
+        "member_count": 450,
+        "org_name": "Anacortes Chamber of Commerce",
+        "source_type": "google_doc_research_report",
+        "zip_codes": [
+          "98221"
+        ],
+        "city": "Anacortes",
+        "imported_at": {
+          "type": "firestore/timestamp/1.0",
+          "seconds": 1770836308,
+          "nanoseconds": 501000000
+        },
+        "advocacy_priorities": [
+          "Highway 20 corridor preservation ($3M repairs)",
+          "Ferry service stabilization (WSF San Juan/Sidney routes)",
+          "Cap Sante Marina Event Facility ($500K capital request)",
+          "B&O tax reduction and restructuring for manufacturing",
+          "Climate Commitment Act modifications for refinery sector",
+          "Workforce housing and childcare capacity expansion",
+          "North Star behavioral health initiative",
+          "Indigent defense cost-sharing (HB 1592)"
+        ],
+        "data_quality": {
+          "missing_fields": [
+            "phone",
+            "email",
+            "founded_year",
+            "office_hours",
+            "board_chair name"
+          ],
+          "needs_validation": [
+            "website URL",
+            "address current accuracy",
+            "2026 tier prices (cents suggest fee+processing)"
+          ],
+          "completeness_score": 85
+        },
+        "key_events": [
+          {
+            "description": "Themed monthly dining programs supporting local restaurants",
+            "timing": "January – March 2026",
+            "name": "Anacortes Cuisine Scene"
+          },
+          {
+            "description": "Annual meeting with strategic goals and economic outlook",
+            "timing": "February 12, 2026",
+            "name": "State of the Chamber"
+          },
+          {
+            "description": "Premier wine and food event for shoulder season tourism",
+            "name": "Anacortes UNCORKED",
+            "timing": "March 7, 2026"
+          },
+          {
+            "description": "Maritime heritage and boating community celebration",
+            "timing": "June 2026",
+            "name": "Waterfront Festival"
+          },
+          {
+            "timing": "August 2026",
+            "name": "Anacortes Arts Festival",
+            "description": "Large-scale festival attracting thousands to Commercial Avenue"
+          },
+          {
+            "name": "Business After Hours",
+            "timing": "Periodic",
+            "description": "B2B networking events"
+          }
+        ],
+        "board_chair": {
+          "name": "",
+          "affiliation": ""
+        },
+        "staff_count": 5,
+        "org_type": "501(c)(6) Non-Profit",
+        "office_hours": "",
+        "website": "https://anacortes.org",
+        "google_doc_source": "https://docs.google.com/document/d/1v7ybEnyv5-_9W8G6k9-D8wwESA3wMsJhJY71aYd6Tm0/edit",
+        "region": "Fidalgo Island / Skagit County",
+        "email": "",
+        "membership_tiers": [
+          {
+            "annual_cost": "$85",
+            "description": "Non-business individual membership",
+            "name": "Individual"
+          },
+          {
+            "description": "501(c) organizations",
+            "name": "Nonprofit",
+            "annual_cost": "$135"
+          },
+          {
+            "name": "Affiliate",
+            "description": "Agents of existing members",
+            "annual_cost": "$220"
+          },
+          {
+            "annual_cost": "$325",
+            "description": "Small businesses, 1-5 employees",
+            "name": "Copper (1-5 FTE)"
+          },
+          {
+            "annual_cost": "$415",
+            "description": "6-10 employees",
+            "name": "Bronze (6-10 FTE)"
+          },
+          {
+            "description": "11-20 employees",
+            "name": "Silver (11-20 FTE)",
+            "annual_cost": "$565"
+          },
+          {
+            "annual_cost": "$860",
+            "name": "Gold (21-40 FTE)",
+            "description": "21-40 employees"
+          },
+          {
+            "name": "Platinum (41-100 FTE)",
+            "annual_cost": "$1,250",
+            "description": "41-100 employees"
+          },
+          {
+            "description": "101+ employees",
+            "annual_cost": "$2,400",
+            "name": "Diamond (101+ FTE)"
+          },
+          {
+            "annual_cost": "Reciprocal",
+            "name": "Courtesy",
+            "description": "Pre-approved partners"
+          }
+        ],
+        "regional_alliances": [
+          "Association of Washington Business (AWB)",
+          "Skagit Chamber Alliance",
+          "Economic Development Alliance of Skagit County (EDASC)",
+          "Port of Anacortes",
+          "Downtown Anacortes Alliance",
+          "City of Anacortes"
+        ],
+        "phone": ""
+      }
+    },
+    {
+      "name": "orgs",
+      "status": "denied"
+    },
+    {
+      "name": "chambers",
+      "status": "denied"
+    },
+    {
+      "name": "users",
+      "status": "denied"
+    },
+    {
+      "name": "leads",
+      "status": "denied"
+    },
+    {
+      "name": "events",
+      "status": "denied"
+    },
+    {
+      "name": "venues",
+      "status": "found",
+      "docCount": 1,
+      "sampleDocId": "1886",
+      "fields": [
+        "vibe",
+        "isPaidLeagueMember",
+        "isVisible",
+        "pointBankLastReset",
+        "foodService",
+        "googlePlaceId",
+        "venueType",
+        "clockIns",
+        "isActive",
+        "location",
+        "currentBuzz",
+        "capacity",
+        "status",
+        "id",
+        "name",
+        "pointBank"
+      ],
+      "sampleData": {
+        "vibe": "Historic and elevated dining with a dedicated bar.",
+        "isPaidLeagueMember": false,
+        "isVisible": true,
+        "pointBankLastReset": 1769116610024,
+        "foodService": "full_kitchen",
+        "googlePlaceId": "ChIJvy_Eq2h1kVQRko-j7SYb3os",
+        "venueType": "restaurant_bar",
+        "clockIns": 0,
+        "isActive": true,
+        "location": {
+          "lng": -122.9056458,
+          "lat": 47.043895
+        },
+        "currentBuzz": {
+          "lastUpdated": 1767436252598,
+          "score": 0
+        },
+        "capacity": 100,
+        "status": "flowing",
+        "id": "1886",
+        "name": "1886",
+        "pointBank": 0
+      }
+    },
+    {
+      "name": "products",
+      "status": "denied"
+    },
+    {
+      "name": "members",
+      "status": "denied"
+    },
+    {
+      "name": "admins",
+      "status": "denied"
+    }
+  ]
+}

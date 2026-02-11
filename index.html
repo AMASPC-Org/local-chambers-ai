@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    
+    <!-- Primary Meta Tags -->
+    <title>localchambers.ai - Find, Join, and Manage Local Chambers of Commerce</title>
+    <meta name="title" content="localchambers.ai - Find, Join, and Manage Local Chambers of Commerce" />
+    <meta name="description" content="Discover and join vetted local chambers of commerce. Get immediate provisional access, automated invoice generation, and AI-optimized networking for your business. Claim your chamber listing today." />
+    <meta name="keywords" content="Chamber of Commerce, Business Networking, Local Business, Membership Platform, AI Agent Directory, localchambers.ai, Business Growth, Local Community" />
+    <meta name="author" content="localchambers.ai" />
+    <meta name="robots" content="index, follow" />
+
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://localchambers.ai/" />
+    <meta property="og:title" content="localchambers.ai - Connect Your Business Locally" />
+    <meta property="og:description" content="The central hub for local business networking. Join or manage chambers of commerce with ease. Immediate access for members, high-density tools for admins." />
+    <meta property="og:image" content="https://images.unsplash.com/photo-1556761175-5973dc0f32e7?ixlib=rb-1.2.1&auto=format&fit=crop&w=1200&h=630&q=80" />
+
+    <!-- Twitter -->
+    <meta property="twitter:card" content="summary_large_image" />
+    <meta property="twitter:url" content="https://localchambers.ai/" />
+    <meta property="twitter:title" content="localchambers.ai - Connect Your Business Locally" />
+    <meta property="twitter:description" content="The central hub for local business networking. Join or manage chambers of commerce with ease." />
+    <meta property="twitter:image" content="https://images.unsplash.com/photo-1556761175-5973dc0f32e7?ixlib=rb-1.2.1&auto=format&fit=crop&w=1200&h=630&q=80" />
+
+    <!-- Favicon & Styling -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Merriweather:wght@300;400;700;900&display=swap" rel="stylesheet">
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            fontFamily: {
+              sans: ['Inter', 'sans-serif'],
+              serif: ['Merriweather', 'serif'],
+            },
+            colors: {
+              chamber: {
+                navy: '#0f172a',    /* Deep trusted blue */
+                gold: '#b45309',    /* Prestige accent */
+                light: '#f8fafc',   /* Clean background */
+              }
+            }
+          }
+        }
+      }
+    </script>
+    <style>
+      body { font-family: 'Inter', sans-serif; }
+    </style>
+    <script type="importmap">
+    {
+      "imports": {
+        "react": "https://esm.sh/react@^19.2.4",
+        "react-dom/": "https://esm.sh/react-dom@^19.2.4/",
+        "react/": "https://esm.sh/react@^19.2.4/",
+        "lucide-react": "https://esm.sh/lucide-react@^0.563.0",
+        "react-router-dom": "https://esm.sh/react-router-dom@^7.13.0",
+        "@google/genai": "https://esm.sh/@google/genai@^1.40.0"
+      }
+    }
+    </script>
+  <link rel="stylesheet" href="/index.css">
+</head>
+  <body class="bg-chamber-light text-slate-800">
+    <div id="root"></div>
+  <script type="module" src="/index.tsx"></script>
+</body>
+</html>
