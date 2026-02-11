@@ -196,10 +196,14 @@ async function main() {
     productSource = 'INLINE_TIERS';
   }
 
+  // Determine leads and products collections
+  const leadsCollection = results.find(r => r.name === 'leads' && r.exists && r.docCount > 0)?.name ?? 'leads';
+  const productsCollection = results.find(r => r.name === 'products' && r.exists && r.docCount > 0)?.name ?? 'products';
+
   const config = {
     organizationsCollection: orgCollection?.name ?? 'organizations',
-    leadsCollection: 'leads',
-    productsCollection: 'products',
+    leadsCollection,
+    productsCollection,
     productSource,
   };
 
