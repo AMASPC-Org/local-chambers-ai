@@ -2,6 +2,7 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import { useOrganizations } from '../src/agents/FrontendAgent';
 import { Head } from '../components/Head';
+import { parsePrice } from '../src/utils/price';
 
 export const AgentIndex: React.FC = () => {
   const { organizations, loading, error } = useOrganizations();
@@ -20,7 +21,7 @@ export const AgentIndex: React.FC = () => {
       "offers": (c.membership_tiers || []).map(p => ({
         "@type": "Offer",
         "name": p.name,
-        "price": p.annual_cost.replace(/[^0-9.]/g, ''),
+        "price": parsePrice(p.annual_cost),
         "priceCurrency": "USD"
       }))
     }))
@@ -81,9 +82,8 @@ export const AgentIndex: React.FC = () => {
               ) : organizations.map((item) => {
                 const tiers = item.membership_tiers || [];
                 const costs = tiers.map(p => {
-                   const numeric = p.annual_cost.replace(/[^0-9.]/g, '');
-                   return numeric ? parseFloat(numeric) : null;
-                }).filter(Boolean) as number[];
+                   return parsePrice(p.annual_cost);
+                }).filter(price => price > 0);
                 
                 const min = costs.length ? Math.min(...costs) : null;
                 const max = costs.length ? Math.max(...costs) : null;

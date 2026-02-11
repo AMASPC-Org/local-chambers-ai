@@ -19,7 +19,7 @@ interface State {
 export class ErrorBoundary extends React.Component<Props, State> {
   constructor(props: Props) {
     super(props);
-    this.state = {
+    (this as any).state = {
       hasError: false,
       error: null
     };
@@ -35,14 +35,17 @@ export class ErrorBoundary extends React.Component<Props, State> {
   }
 
   handleRetry = () => {
-    this.setState({ hasError: false, error: null });
+    (this as any).setState({ hasError: false, error: null });
   };
 
   render() {
-    if (this.state.hasError) {
-      if (this.props.fallback) return this.props.fallback;
+    const state = (this as any).state as State;
+    const props = (this as any).props as Props;
 
-      const error = this.state.error;
+    if (state.hasError) {
+      if (props.fallback) return props.fallback;
+
+      const error = state.error;
 
       return (
         <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 flex items-center justify-center p-6 font-sans">
@@ -98,6 +101,6 @@ export class ErrorBoundary extends React.Component<Props, State> {
       );
     }
 
-    return (this.props as any).children;
+    return props.children;
   }
 }

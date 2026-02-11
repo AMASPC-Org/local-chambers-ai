@@ -160,7 +160,12 @@ export const SearchResults: React.FC = () => {
                         >
                            <div className="flex justify-between items-start mb-4">
                               <span className="text-[10px] font-black text-chamber-gold bg-amber-50 px-3 py-1 rounded-full uppercase tracking-[0.2em]">{c.region}</span>
-                              <div className="w-2.5 h-2.5 rounded-full bg-green-500 shadow-[0_0_10px_rgba(34,197,94,0.5)]" />
+                              <div className="flex items-center gap-2">
+                                 <div className="w-8 h-8 rounded-lg bg-slate-50 border border-slate-100 flex items-center justify-center text-xs font-black text-chamber-gold">
+                                    {c.org_name?.[0]}
+                                 </div>
+                                 <div className="w-2.5 h-2.5 rounded-full bg-green-500 shadow-[0_0_10px_rgba(34,197,94,0.5)]" />
+                              </div>
                            </div>
                            <h4 className="font-serif font-black text-slate-900 truncate mb-1 text-lg group-hover/card:text-chamber-gold transition-colors">{c.org_name}</h4>
                            <p className="text-xs text-slate-500 line-clamp-1 font-bold mb-6">{c.address || 'Central Headquarters'}</p>

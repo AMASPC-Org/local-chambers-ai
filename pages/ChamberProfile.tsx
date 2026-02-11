@@ -5,6 +5,7 @@ import { useOrganization, useLeadSubmit } from '../src/agents/FrontendAgent';
 import { Loader2, Check, CreditCard, FileText, Mail, Info, X, Phone, User, Send, MapPin, Globe } from 'lucide-react';
 import { Head } from '../components/Head';
 import { ChamberMap } from '../components/ChamberMap';
+import { parsePrice } from '../src/utils/price';
 
 export const ChamberProfile: React.FC = () => {
   const { id } = useParams<{ id: string }>();
@@ -22,14 +23,14 @@ export const ChamberProfile: React.FC = () => {
   // Derive chamber + products from hook
   const chamber = org;
   const products = (org?.membership_tiers || []).map((t: any, index: number) => {
-    const numericPrice = parseFloat(t.annual_cost.replace(/[^0-9.]/g, '')) || 0;
+    const numericPrice = parsePrice(t.annual_cost);
     return {
       id: `tier-${index}`,
       name: t.name,
       description: t.description,
       price: numericPrice,
       pricingType: numericPrice > 0 ? 'Fixed' : 'Contact',
-      benefits: [] // Seeded data has separate services, but for now we'll leave this empty or map advocacy
+      benefits: [] 
     };
   });
 
@@ -103,11 +104,11 @@ export const ChamberProfile: React.FC = () => {
           <div className="mt-8 flex items-center justify-center gap-6 text-slate-400">
             <div className="flex items-center gap-2">
               <MapPin className="w-4 h-4 text-chamber-gold" />
-              <span className="text-sm font-medium">{chamber.region}</span>
+              <span className="text-sm font-medium">{chamber.region || chamber.city || 'Regional Center'}</span>
             </div>
             <div className="flex items-center gap-2">
               <Globe className="w-4 h-4 text-chamber-gold" />
-              <span className="text-sm font-medium">{chamber.website}</span>
+              <span className="text-sm font-medium">{chamber.website || 'No Website Listed'}</span>
             </div>
           </div>
         </div>
@@ -139,12 +140,12 @@ export const ChamberProfile: React.FC = () => {
 
           {/* Quick Info / Verification */}
           <div className="bg-slate-50 rounded-3xl p-6 border border-slate-200 flex items-center gap-4">
-             <div className={`p-3 rounded-2xl ${chamber.data_quality.completeness_score > 70 ? 'bg-amber-100 text-chamber-gold' : 'bg-slate-200 text-slate-400'}`}>
+             <div className={`p-3 rounded-2xl ${chamber.data_quality?.completeness_score > 70 ? 'bg-amber-100 text-chamber-gold' : 'bg-slate-200 text-slate-400'}`}>
                <Check className="w-6 h-6" />
              </div>
              <div>
                <p className="text-xs font-bold text-slate-400 uppercase tracking-widest">Data Confidence Score</p>
-               <p className="font-bold text-slate-900">{chamber.data_quality.completeness_score}% Reliable</p>
+               <p className="font-bold text-slate-900">{chamber.data_quality?.completeness_score || 0}% Reliable</p>
              </div>
           </div>
         </div>
