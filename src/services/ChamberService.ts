@@ -90,7 +90,7 @@ class ChamberService {
       const searchWords = lowerTerm.split(/\s+/).filter(Boolean);
 
       snapshot.forEach((doc) => {
-        const data = doc.data();
+        const data = doc.data() as any;
         // Spread raw data first, then overlay mapped Chamber fields.
         // This lets UI components access both raw fields (org_name, city, state, services)
         // AND the normalized Chamber interface fields (name, region, etc.).

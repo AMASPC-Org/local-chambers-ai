@@ -5,6 +5,7 @@ import { getPerformance, FirebasePerformance } from 'firebase/performance';
 import { getAnalytics, Analytics, isSupported as isAnalyticsSupported } from 'firebase/analytics';
 import { getRemoteConfig, RemoteConfig } from 'firebase/remote-config';
 import { getFunctions, Functions, connectFunctionsEmulator } from 'firebase/functions';
+import { GoogleAuthProvider, OAuthProvider } from 'firebase/auth';
 // SEC-2 FIX: GoogleGenAI import removed — API keys must not be in client bundle
 
 class CloudAgent {
@@ -88,3 +89,9 @@ export const db = cloudAgent.db;
 export const auth = cloudAgent.auth;
 export const functions = cloudAgent.functions;
 export const remoteConfig = cloudAgent.remoteConfig;
+
+// Auth Providers
+export const googleProvider = new GoogleAuthProvider();
+googleProvider.setCustomParameters({ hd: 'amaspc.com' });
+// LinkedIn usually uses OAuthProvider with "oidc.linkedin" or a custom flow
+export const linkedInProvider = new OAuthProvider('oidc.linkedin');

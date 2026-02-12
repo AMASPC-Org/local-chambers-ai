@@ -13,7 +13,7 @@ export const AdminLogin: React.FC = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     const result = await claim(selectedChamber, email);
-    if (result.status === 'success') {
+    if (result.success) {
       navigate('/admin/verify', { state: { chamberId: selectedChamber, email } });
     }
   };
@@ -21,7 +21,7 @@ export const AdminLogin: React.FC = () => {
   return (
     <div className="min-h-screen bg-slate-900 flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8 font-sans">
       <Head title="Admin Portal" description="Claim and manage your Chamber of Commerce profile." />
-      
+
       <div className="max-w-md w-full space-y-8 bg-white p-10 rounded-2xl shadow-2xl">
         <div className="text-center">
           <div className="mx-auto h-16 w-16 bg-chamber-gold rounded-full flex items-center justify-center mb-6">
@@ -37,7 +37,7 @@ export const AdminLogin: React.FC = () => {
               {error}
             </div>
           )}
-          
+
           <div className="space-y-4">
             <div>
               <label className="block text-sm font-medium text-slate-700">Select Your Chamber</label>
@@ -85,9 +85,9 @@ export const AdminLogin: React.FC = () => {
           >
             {loading ? <Loader2 className="animate-spin h-5 w-5" /> : 'Claim & Verify Identity'}
           </button>
-          
+
           <div className="text-center">
-             <Link to="/" className="text-sm font-medium text-chamber-gold hover:text-chamber-navy">Return to Home</Link>
+            <Link to="/" className="text-sm font-medium text-chamber-gold hover:text-chamber-navy">Return to Home</Link>
           </div>
         </form>
       </div>

@@ -7,7 +7,7 @@ import type {
   SignUpPayload,
   MembershipPayload,
   ChamberProduct
-} from '../../types';
+} from '../types';
 import { QueryDocumentSnapshot, DocumentData } from 'firebase/firestore';
 
 /**
@@ -181,6 +181,56 @@ export function useLogin() {
 }
 
 /**
+ * Hook for Google OAuth
+ */
+export function useGoogleSignIn() {
+  const [loading, setLoading] = useState<boolean>(false);
+  const [error, setError] = useState<string | null>(null);
+
+  const signIn = async (): Promise<{ status: 'success'; user: any } | { status: 'error'; message: string }> => {
+    setLoading(true);
+    setError(null);
+    try {
+      const response = await backendAgent.signInWithGoogle();
+      return response as any;
+    } catch (err: any) {
+      const message = err.message || 'Google sign-in failed';
+      setError(message);
+      return { status: 'error', message };
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return { signIn, loading, error };
+}
+
+/**
+ * Hook for LinkedIn OAuth
+ */
+export function useLinkedInSignIn() {
+  const [loading, setLoading] = useState<boolean>(false);
+  const [error, setError] = useState<string | null>(null);
+
+  const signIn = async (): Promise<{ status: 'success'; user: any } | { status: 'error'; message: string }> => {
+    setLoading(true);
+    setError(null);
+    try {
+      const response = await backendAgent.signInWithLinkedIn();
+      return response as any;
+    } catch (err: any) {
+      const message = err.message || 'LinkedIn sign-in failed';
+      setError(message);
+      return { status: 'error', message };
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return { signIn, loading, error };
+}
+
+/**
  * Hook for sign up
  */
 export function useSignUp() {
@@ -345,9 +395,9 @@ export function useClaimListing() {
     setError(null);
     try {
       return await backendAgent.claimListing(email, orgId);
-    } catch (err) {
+    } catch (err: any) {
       setError(err);
-      return { status: 'error' };
+      return { success: false, error: err.message };
     } finally {
       setLoading(false);
     }

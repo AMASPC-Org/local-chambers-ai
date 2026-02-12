@@ -48,6 +48,7 @@ const AuthFallback = () => <Skeleton.AuthForm />;
 // --- App ---
 
 import { APIProvider } from '@vis.gl/react-google-maps';
+import { AuthProvider } from './contexts/AuthContext';
 
 export default function App() {
   const googleMapsApiKey = import.meta.env.VITE_GOOGLE_MAPS_API_KEY || '';
@@ -55,33 +56,35 @@ export default function App() {
   return (
     <ErrorBoundary>
       <APIProvider apiKey={googleMapsApiKey}>
-        <HashRouter>
-          <Layout>
-            <Suspense fallback={<div className="h-screen flex items-center justify-center"><div className="w-8 h-8 border-4 border-chamber-gold border-t-transparent rounded-full animate-spin"></div></div>}>
-              <Routes>
-                {/* Public Routes */}
-                <Route path="/" element={<Home />} />
-                <Route path="/search" element={<Suspense fallback={<DirectoryFallback />}><SearchResults /></Suspense>} />
-                <Route path="/chamber/:id" element={<Suspense fallback={<ProfileFallback />}><ChamberProfile /></Suspense>} />
-                <Route path="/checkout" element={<Suspense fallback={<DirectoryFallback />}><Checkout /></Suspense>} />
-                <Route path="/get-started" element={<Suspense fallback={<DirectoryFallback />}><GetStarted /></Suspense>} />
-                <Route path="/agents" element={<Suspense fallback={<DirectoryFallback />}><AgentIndex /></Suspense>} />
+        <AuthProvider>
+          <HashRouter>
+            <Layout>
+              <Suspense fallback={<div className="h-screen flex items-center justify-center"><div className="w-8 h-8 border-4 border-chamber-gold border-t-transparent rounded-full animate-spin"></div></div>}>
+                <Routes>
+                  {/* Public Routes */}
+                  <Route path="/" element={<Home />} />
+                  <Route path="/search" element={<Suspense fallback={<DirectoryFallback />}><SearchResults /></Suspense>} />
+                  <Route path="/chamber/:id" element={<Suspense fallback={<ProfileFallback />}><ChamberProfile /></Suspense>} />
+                  <Route path="/checkout" element={<Suspense fallback={<DirectoryFallback />}><Checkout /></Suspense>} />
+                  <Route path="/get-started" element={<Suspense fallback={<DirectoryFallback />}><GetStarted /></Suspense>} />
+                  <Route path="/agents" element={<Suspense fallback={<DirectoryFallback />}><AgentIndex /></Suspense>} />
 
-                {/* Auth Routes */}
-                <Route path="/login" element={<Suspense fallback={<AuthFallback />}><Login /></Suspense>} />
-                <Route path="/signup" element={<Suspense fallback={<AuthFallback />}><SignUp /></Suspense>} />
-                <Route path="/onboarding/*" element={<Suspense fallback={<AuthFallback />}><Onboarding /></Suspense>} />
+                  {/* Auth Routes */}
+                  <Route path="/login" element={<Suspense fallback={<AuthFallback />}><Login /></Suspense>} />
+                  <Route path="/signup" element={<Suspense fallback={<AuthFallback />}><SignUp /></Suspense>} />
+                  <Route path="/onboarding/*" element={<Suspense fallback={<AuthFallback />}><Onboarding /></Suspense>} />
 
-                {/* Admin Routes */}
-                <Route path="/admin" element={<Suspense fallback={<AuthFallback />}><AdminLogin /></Suspense>} />
-                <Route path="/admin/verify" element={<Suspense fallback={<AuthFallback />}><AdminVerify /></Suspense>} />
-                <Route path="/admin/wizard" element={<Suspense fallback={<AdminFallback />}><AdminWizard /></Suspense>} />
-                <Route path="/admin/dashboard" element={<Suspense fallback={<AdminFallback />}><AdminDashboard /></Suspense>} />
-                <Route path="/admin/products" element={<Suspense fallback={<AdminFallback />}><AdminProducts /></Suspense>} />
-              </Routes>
-            </Suspense>
-          </Layout>
-        </HashRouter>
+                  {/* Admin Routes */}
+                  <Route path="/admin" element={<Suspense fallback={<AuthFallback />}><AdminLogin /></Suspense>} />
+                  <Route path="/admin/verify" element={<Suspense fallback={<AuthFallback />}><AdminVerify /></Suspense>} />
+                  <Route path="/admin/wizard" element={<Suspense fallback={<AdminFallback />}><AdminWizard /></Suspense>} />
+                  <Route path="/admin/dashboard" element={<Suspense fallback={<AdminFallback />}><AdminDashboard /></Suspense>} />
+                  <Route path="/admin/products" element={<Suspense fallback={<AdminFallback />}><AdminProducts /></Suspense>} />
+                </Routes>
+              </Suspense>
+            </Layout>
+          </HashRouter>
+        </AuthProvider>
       </APIProvider>
     </ErrorBoundary>
   );

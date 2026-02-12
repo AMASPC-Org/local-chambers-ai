@@ -42,6 +42,12 @@ export interface Chamber {
   verificationStatus: 'Unverified' | 'Verified' | 'Pending';
   stripeConnected: boolean;
   ownerId?: string;
+  // Raw fields from Firestore kept for backward compatibility and specific UI needs
+  org_name?: string;
+  city?: string;
+  state?: string;
+  services?: string[];
+  membership_tiers?: any;
   // Legacy tiers kept for compatibility with old components, but products are preferred
   tiers: {
     bronze: number;
@@ -58,6 +64,9 @@ export interface User {
   firstName?: string;
   lastName?: string;
 }
+
+/** Alias for backward compatibility in some agents */
+export type UserProfile = User;
 
 export type MembershipStatus = 'Provisional' | 'Pending_Invoice' | 'Active' | 'None';
 export type PaymentMethod = 'Card' | 'Invoice';

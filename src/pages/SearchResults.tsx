@@ -1,3 +1,4 @@
+/* global google */
 import React, { useState, useEffect } from 'react';
 import { useSearchParams, useNavigate } from 'react-router-dom';
 import { useChambers } from '../hooks/useChambers';
@@ -25,7 +26,7 @@ export function SearchResults() {
   const [viewMode, setViewMode] = useState<'grid' | 'map'>('grid');
   const [selectedChamber, setSelectedChamber] = useState<Chamber | null>(null);
 
-  const { data: results = [], isLoading } = useChambers(query, { region });
+  const { data: results = [], isLoading } = useChambers({ query, region });
 
   const map = useMap();
 
@@ -33,7 +34,7 @@ export function SearchResults() {
   useEffect(() => {
     if (!map || results.length === 0 || viewMode !== 'map') return;
 
-    const bounds = new google.maps.LatLngBounds();
+    const bounds = new (window as any).google.maps.LatLngBounds();
     let hasCoords = false;
 
     results.forEach(c => {
@@ -129,7 +130,13 @@ export function SearchResults() {
                       <Marker
                         key={chamber.id}
                         position={chamber.coordinates!}
-                        onClick={() => setSelectedChamber(chamber)}
+                        title={chamber.org_name}
+                        onClick={() => {
+                          setSelectedChamber(chamber);
+                          if (map && chamber.coordinates) {
+                            map.panTo(chamber.coordinates);
+                          }
+                        }}
                       />
                     ))}
 
@@ -137,8 +144,14 @@ export function SearchResults() {
                       <InfoWindow
                         position={selectedChamber.coordinates}
                         onCloseClick={() => setSelectedChamber(null)}
+                        headerContent={
+                          <div className="flex items-center gap-2">
+                            <Star className="w-3.5 h-3.5 text-chamber-gold fill-chamber-gold" />
+                            <span className="text-[10px] font-bold uppercase tracking-widest text-slate-400">Featured Chamber</span>
+                          </div>
+                        }
                       >
-                        <div className="p-2 min-w-[240px]">
+                        <div className="p-1 min-w-[220px]">
                           <div className="flex items-center gap-2 mb-3">
                             <Star className="w-4 h-4 text-chamber-gold fill-chamber-gold" />
                             <span className="text-[10px] font-black uppercase tracking-widest text-slate-400">Verified Member</span>

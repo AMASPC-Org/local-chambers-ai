@@ -1,3 +1,5 @@
+import React, { useState } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
 import { ChevronRight, ChevronLeft, Check, Sparkles, Building2, FileText, Send, MessageSquare } from 'lucide-react';
 import { Link } from 'react-router-dom';
 

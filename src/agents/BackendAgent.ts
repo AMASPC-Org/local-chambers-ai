@@ -27,9 +27,9 @@ import {
   updateDoc,
   writeBatch,
 } from 'firebase/firestore';
-import { db, auth, functions } from './CloudAgent';
+import { db, auth, functions, googleProvider, linkedInProvider } from './CloudAgent';
 import { httpsCallable } from 'firebase/functions';
-import { GoogleAuthProvider, signInWithPopup, signOut, createUserWithEmailAndPassword, signInWithEmailAndPassword, updateProfile } from 'firebase/auth';
+import { GoogleAuthProvider, signInWithPopup, signOut, createUserWithEmailAndPassword, signInWithEmailAndPassword, updateProfile, User as FirebaseUser } from 'firebase/auth';
 import { parsePrice } from '../utils/price';
 import type {
   Chamber,
@@ -42,9 +42,10 @@ import type {
   TransactionResult,
   MemberRecord,
   MembershipTier,
+  UserProfile,
   VerificationResponse,
   MembershipPacketResponse
-} from '../../types';
+} from '../types';
 import { chamberService } from '../services/ChamberService';
 
 
@@ -228,7 +229,7 @@ class BackendAgent {
   async getChamber(id: string) { return this.getOrganization(id); }
   async getChamberById(id: string) { return this.getOrganization(id); }
   async getOrganizationById(id: string) { return this.getOrganization(id); }
-  async saveChamberProduct(p: ChamberProduct) { return this.saveProduct(p); }
+  async saveChamberProduct(p: ChamberProduct | Omit<ChamberProduct, 'id'>) { return this.saveProduct(p); }
   async deleteChamberProduct(id: string) { return this.deleteProduct(id); }
   async getChamberProducts(id: string) { return this.getProducts(id); }
   async getProductsByChamberId(id: string) { return this.getProducts(id); }
@@ -318,6 +319,55 @@ class BackendAgent {
     return registerUser(payload);
   }
 
+  // -----------------------------------------------------------------------
+  // Real Firebase Auth Implementation
+  // -----------------------------------------------------------------------
+
+  private mapFirebaseUserToUser(user: FirebaseUser): any {
+    return {
+      id: user.uid,
+      email: user.email || '',
+      firstName: user.displayName?.split(' ')[0] || '',
+      lastName: user.displayName?.split(' ').slice(1).join(' ') || '',
+      companyName: '', // Populated later or via registration
+      isNonProfit: false,
+    };
+  }
+
+  async signInWithGoogle(): Promise<AuthResponse> {
+    try {
+      const result = await signInWithPopup(auth, googleProvider);
+      return {
+        status: 'success',
+        user: this.mapFirebaseUserToUser(result.user)
+      };
+    } catch (error: any) {
+      console.error('[BackendAgent] Google sign-in failed:', error);
+      return { status: 'error', message: error.message };
+    }
+  }
+
+  async signInWithLinkedIn(): Promise<AuthResponse> {
+    try {
+      const result = await signInWithPopup(auth, linkedInProvider);
+      return {
+        status: 'success',
+        user: this.mapFirebaseUserToUser(result.user)
+      };
+    } catch (error: any) {
+      console.error('[BackendAgent] LinkedIn sign-in failed:', error);
+      return { status: 'error', message: error.message };
+    }
+  }
+
+  async logout(): Promise<void> {
+    await signOut(auth);
+  }
+
+  getCurrentUser(): FirebaseUser | null {
+    return auth.currentUser;
+  }
+
   /** Legacy alias for FrontendAgent compat */
   async login(payload: LoginPayload) { return this.loginUser(payload); }
   async register(payload: SignUpPayload) { return this.registerUser(payload); }
@@ -366,9 +416,9 @@ class BackendAgent {
     return approveMember(memberId);
   }
 
-  async saveProduct(product: ChamberProduct) {
+  async saveProduct(product: ChamberProduct | Omit<ChamberProduct, 'id'>) {
     const { saveChamberProduct } = await import('../../services/gasShim');
-    return saveChamberProduct(product);
+    return saveChamberProduct(product as any);
   }
 
   async deleteProduct(id: string) {

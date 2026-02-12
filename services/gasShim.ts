@@ -8,7 +8,7 @@
  *   gasShim.getChamberById() →  useOrganization(id)   (FrontendAgent)
  *   gasShim.createLead()     →  useLeadSubmit()       (FrontendAgent)
  */
-import { Chamber, MembershipPayload, TransactionResult, LoginPayload, SignUpPayload, AuthResponse, MemberRecord, MembershipTier, ChamberProduct, MembershipLead } from '../types';
+import { Chamber, MembershipPayload, TransactionResult, LoginPayload, SignUpPayload, AuthResponse, MemberRecord, MembershipTier, ChamberProduct, MembershipLead } from '../src/types';
 
 const MOCK_CHAMBERS: Chamber[] = [
   {
