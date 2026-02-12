@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { useOrganization, useAISuggestions } from '../src/agents/FrontendAgent';
-import { backendAgent } from '../src/agents/BackendAgent';
+import { useOrganization, useAISuggestions } from '../agents/FrontendAgent';
+import { backendAgent } from '../agents/BackendAgent';
 import { MembershipTier, ChamberProduct } from '../types';
 import { Loader2, Sparkles, Upload, ArrowRight, Check, Info } from 'lucide-react';
 

@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { Head } from '../components/Head';
-import { useClaimListing } from '../src/agents/FrontendAgent';
+import { useClaimListing } from '../agents/FrontendAgent';
 import { Loader2, ShieldCheck, Mail, Building2 } from 'lucide-react';
 
 export const AdminLogin: React.FC = () => {

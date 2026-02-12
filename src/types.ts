@@ -41,6 +41,7 @@ export interface Chamber {
   websiteDomain: string;
   verificationStatus: 'Unverified' | 'Verified' | 'Pending';
   stripeConnected: boolean;
+  ownerId?: string;
   // Legacy tiers kept for compatibility with old components, but products are preferred
   tiers: {
     bronze: number;
@@ -105,4 +106,32 @@ export interface AuthResponse {
   message?: string;
   token?: string;
   user?: User;
+}
+
+export interface VerificationResponse {
+  success: boolean;
+  message?: string;
+}
+
+export interface MembershipPacketResponse {
+  downloadUrl: string;
+  expiresAt: string;
+  hash: string;
+}
+
+export interface ChatMessage {
+  role: 'user' | 'assistant' | 'system';
+  content: string;
+  timestamp: number;
+}
+
+export interface ChatRequest {
+  message: string;
+  history: ChatMessage[];
+  chamberId?: string;
+}
+
+export interface ChatResponse {
+  reply: string;
+  suggestedAction?: string;
 }

@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Head } from '../components/Head';
-import { useLogin } from '../src/agents/FrontendAgent';
+import { useLogin } from '../agents/FrontendAgent';
 import { Loader2, Lock } from 'lucide-react';
 
 export const Login: React.FC = () => {

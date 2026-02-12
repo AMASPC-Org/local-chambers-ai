@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { useVerifyOTP } from '../src/agents/FrontendAgent';
+import { useVerifyOTP } from '../agents/FrontendAgent';
 import { Loader2, Key } from 'lucide-react';
 
 export const AdminVerify: React.FC = () => {

@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useLocation, Link } from 'react-router-dom';
-import { useCheckout } from '../src/agents/FrontendAgent';
+import { useCheckout } from '../agents/FrontendAgent';
 import { MembershipPayload, TransactionResult } from '../types';
 import { CreditCard, FileText, Lock, Loader2, CheckCircle, ChevronLeft } from 'lucide-react';
 

@@ -1,8 +1,8 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { useOrganizations } from '../src/agents/FrontendAgent';
+import { useOrganizations } from '../agents/FrontendAgent';
 import { Head } from '../components/Head';
-import { parsePrice } from '../src/utils/price';
+import { parsePrice } from '../utils/price';
 
 export const AgentIndex: React.FC = () => {
   const { organizations, loading, error } = useOrganizations();

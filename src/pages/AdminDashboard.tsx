@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { useAdminMembers } from '../src/agents/FrontendAgent';
+import { useAdminMembers } from '../agents/FrontendAgent';
 import { Loader2, Users, CreditCard, TrendingUp, Search, CheckCircle, ExternalLink, ShieldCheck, UserCheck, Mail, LayoutGrid } from 'lucide-react';
 
 export const AdminDashboard: React.FC = () => {

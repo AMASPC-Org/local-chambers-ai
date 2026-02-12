@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Head } from '../components/Head';
-import { useSignUp } from '../src/agents/FrontendAgent';
+import { useSignUp } from '../agents/FrontendAgent';
 import { Loader2, UserPlus } from 'lucide-react';
 
 export const SignUp: React.FC = () => {

@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { useChamberProducts } from '../src/agents/FrontendAgent';
+import { useChamberProducts } from '../agents/FrontendAgent';
 import { ChamberProduct } from '../types';
 import { Loader2, Plus, Trash2, Save, ChevronLeft, LayoutGrid, Info, Check } from 'lucide-react';
 

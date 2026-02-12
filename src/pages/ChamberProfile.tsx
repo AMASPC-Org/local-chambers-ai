@@ -1,11 +1,11 @@
 import React, { useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { ChamberProduct, MembershipLead } from '../types';
-import { useOrganization, useLeadSubmit } from '../src/agents/FrontendAgent';
+import { useOrganization, useLeadSubmit } from '../agents/FrontendAgent';
 import { Loader2, Check, CreditCard, FileText, Mail, Info, X, Phone, User, Send, MapPin, Globe } from 'lucide-react';
 import { Head } from '../components/Head';
 import { ChamberMap } from '../components/ChamberMap';
-import { parsePrice } from '../src/utils/price';
+import { parsePrice } from '../utils/price';
 
 export const ChamberProfile: React.FC = () => {
   const { id } = useParams<{ id: string }>();
@@ -225,6 +225,7 @@ export const ChamberProfile: React.FC = () => {
                 <h4 className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-4">Headquarters & Directions</h4>
                 <ChamberMap 
                   address={chamber.address} 
+                  coordinates={chamber.coordinates}
                   name={chamber.org_name} 
                 />
                 
