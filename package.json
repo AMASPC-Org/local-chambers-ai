@@ -7,7 +7,9 @@
     "dev": "vite",
     "build": "vite build",
     "preview": "vite preview",
-    "audit:drift": "node scripts/audit-drift.js"
+    "preview": "vite preview",
+    "audit:drift": "node scripts/audit-drift.js",
+    "verify": "vite build"
   },
   "dependencies": {
     "@tanstack/react-query": "^5.90.21",
