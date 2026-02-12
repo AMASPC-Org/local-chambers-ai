@@ -3,14 +3,18 @@
  * Cloud Agent: Seed script to populate the `organizations` collection from chamber research data.
  * Run: npx tsx scripts/seed-organizations.ts
  */
-import { initializeApp } from 'firebase/app';
-import { getFirestore, doc, setDoc, Timestamp } from 'firebase/firestore';
+import { initializeApp, applicationDefault } from 'firebase-admin/app';
+import { getFirestore, Timestamp } from 'firebase-admin/firestore';
 import * as fs from 'fs';
 import * as path from 'path';
 
 // --- ENV LOADER ---
 function loadEnv(): Record<string, string> {
   const envPath = path.resolve(process.cwd(), '.env.local');
+  if (!fs.existsSync(envPath)) {
+    console.warn(`[Seed Script] ⚠️  No .env.local found at ${envPath}. Using defaults.`);
+    return { VITE_FIREBASE_PROJECT_ID: 'localchambersai' };
+  }
   const content = fs.readFileSync(envPath, 'utf-8');
   const env: Record<string, string> = {};
   for (const line of content.split('\n')) {
@@ -85,292 +89,413 @@ interface Organization {
   };
   imported_at: any;               // Firestore Timestamp
   source_type: string;            // "google_doc_research_report"
+  coordinates?: { lat: number; lng: number };  // Map pin location
 }
 
 // --- CHAMBER DATA ---
 const organizations: Organization[] = [
   // ==========================================
-  // 1. BELLINGHAM REGIONAL CHAMBER OF COMMERCE
+  // 1. AUBURN AREA CHAMBER OF COMMERCE
   // ==========================================
   {
-    org_name: "Bellingham Regional Chamber of Commerce",
+    org_name: "Auburn Area Chamber of Commerce",
     org_type: "501(c)(6) Non-Profit",
-    founded_year: null, // "more than 110 years" → ~1916, but not explicitly stated
-    region: "Northwest Washington",
-    city: "Bellingham",
+    founded_year: null,
+    region: "South Puget Sound",
+    city: "Auburn",
     state: "WA",
-    zip_codes: ["98225", "98226", "98227", "98228", "98229"],
-    address: "119 N Commercial St, Bellingham, WA",
-    phone: "", // Not found in research doc
-    website: "https://bellingham.com",
-    email: "", // Not found in research doc
-    office_hours: "Monday – Thursday, 10:00 AM – 3:00 PM",
-    google_doc_source: "https://docs.google.com/document/d/1Lhl27ra3bpNrdHgePldbUpqaOFb_zGnyucOu8j2TSmQ/edit",
-
-    executive: {
-      name: "Guy Occhiogrosso",
-      title: "President/CEO",
-      since_year: 2014,
-    },
-    board_chair: {
-      name: "Keith Coleman",
-      affiliation: "Marriott SpringHill Suites & TownePlace Suites",
-    },
-    board_size: 16, // 16 directors listed + ex-officio
-    staff_count: 5,  // Guy, Crysie, Lexi, Sandra, Megan
-
-    member_count: null, // Not explicitly stated
+    zip_codes: ["98001", "98002", "98092", "98047"],
+    address: "Auburn, WA",
+    phone: "",
+    website: "http://www.auburnareaconnect.com",
+    email: "",
+    office_hours: "",
+    google_doc_source: "https://docs.google.com/document/d/1LUzmTr7uwZyawtX8tkfvvcmqzi62PV4jg6Htad6XUA4/edit",
+    executive: { name: "Kacie Bray", title: "President & CEO", since_year: null },
+    board_chair: { name: "Richard Stirgus", affiliation: "U.S. Bank" },
+    board_size: 15,
+    staff_count: 0,
+    member_count: null,
     membership_tiers: [
-      { name: "Basic", annual_cost: "Not specified", description: "Foundational networking, directory listing, tax-deductible dues" },
-      { name: "Supporting", annual_cost: "Not specified", description: "Enhanced digital marketing: 1600-char description, photos/video, 20 keywords, 5 hyperlinks, direct mail access" },
-      { name: "Premium", annual_cost: "Not specified", description: "Priority Business Buzz newsletter (8x/yr), event sponsorship discounts, free Certificates of Origin" },
-      { name: "Executive", annual_cost: "Not specified", description: "Strategic visibility, 4 hours conference room use" },
+      { name: "Standard", annual_cost: "$300 - $500", description: "Base membership" },
+      { name: "Silver", annual_cost: "$1,500", description: "Premium tier" },
+      { name: "Gold", annual_cost: "$2,500", description: "Premium tier" },
+      { name: "Platinum", annual_cost: "$5,000", description: "Maximum visibility" }
     ],
-
     key_events: [
-      { name: "Monthly Networking Breakfasts", timing: "Monthly", description: "Recurring networking events for members" },
-      { name: "Handshakes and Happy Hour", timing: "Periodic", description: "Social networking events" },
-      { name: "Annual Awards Dinner", timing: "Annual", description: "Community recognition and morale" },
-      { name: "Leadership Whatcom", timing: "9-month program", description: "Civic leadership development, one Friday/month" },
-      { name: "Top 7 Under 40", timing: "Annual", description: "Emerging leader recognition program" },
+      { name: "Spotlight Awards", timing: "Annual", description: "Community recognition" },
+      { name: "Santa Parade", timing: "December", description: "Holiday event" }
     ],
-
     advocacy_priorities: [
-      "Expand baseload energy production; stabilize Climate Commitment Act",
-      "Oppose new employer taxes; restructure B&O tax",
-      "Transparent UI and PFML rates",
-      "Balanced approach to AI regulation",
-      "Zoning reform for workforce housing",
-      "Expedite permit timelines for new construction",
-      "Public safety solutions for business district disturbances",
-      "CEDS 2027-2031 strategic planning",
+      "Public Safety", "Attainable Housing", "Infrastructure", "Workforce Development"
     ],
-
-    services: [
-      "Online and printed business directory",
-      "Business Buzz e-newsletter",
-      "WhatCALENDAR.com community event hub",
-      "Business Health Trust (BHT) insurance access",
-      "Certificates of Origin for international exports",
-      "Conference room use (Premium+)",
-      "Leadership Whatcom training program",
-      "Whatcom Young Professionals networking",
-    ],
-
-    regional_alliances: [
-      "Association of Washington Business (AWB)",
-      "Washington Economic Development Association (WEDA)",
-      "Downtown Bellingham Partnership",
-      "Whatcom Council of Governments",
-      "Port of Bellingham",
-      "Northwest Workforce Council",
-      "Western Washington University Career Center",
-    ],
-
-    data_quality: {
-      completeness_score: 75,
-      missing_fields: ["phone", "email", "founded_year", "member_count", "exact tier pricing"],
-      needs_validation: ["address current accuracy", "office_hours current accuracy", "board composition for 2026"],
-    },
-    imported_at: null, // Set at write time
-    source_type: "google_doc_research_report",
-  },
-
-  // ==========================================
-  // 2. ANACORTES CHAMBER OF COMMERCE
-  // ==========================================
-  {
-    org_name: "Anacortes Chamber of Commerce",
-    org_type: "501(c)(6) Non-Profit",
-    founded_year: null, // City incorporated 1891, Chamber founding year not stated
-    region: "Fidalgo Island / Skagit County",
-    city: "Anacortes",
-    state: "WA",
-    zip_codes: ["98221"],
-    address: "819 Commercial Avenue, Suite F, Anacortes, WA",
-    phone: "", // Not found in research doc
-    website: "https://anacortes.org",
-    email: "", // Not found in research doc
-    office_hours: "", // Not explicitly stated
-    google_doc_source: "https://docs.google.com/document/d/1v7ybEnyv5-_9W8G6k9-D8wwESA3wMsJhJY71aYd6Tm0/edit",
-
-    executive: {
-      name: "Jesica Kiser",
-      title: "President/CEO",
-      since_year: 2015,
-    },
-    board_chair: {
-      name: "", // Not explicitly identified as "Chair" in the doc
-      affiliation: "",
-    },
-    board_size: 10, // ~10 directors listed
-    staff_count: 5,  // Jesica, Becky, Jordan, Evan, Christina
-
-    member_count: 450,
-    membership_tiers: [
-      { name: "Individual", annual_cost: "$85", description: "Non-business individual membership" },
-      { name: "Nonprofit", annual_cost: "$135", description: "501(c) organizations" },
-      { name: "Affiliate", annual_cost: "$220", description: "Agents of existing members" },
-      { name: "Copper (1-5 FTE)", annual_cost: "$325", description: "Small businesses, 1-5 employees" },
-      { name: "Bronze (6-10 FTE)", annual_cost: "$415", description: "6-10 employees" },
-      { name: "Silver (11-20 FTE)", annual_cost: "$565", description: "11-20 employees" },
-      { name: "Gold (21-40 FTE)", annual_cost: "$860", description: "21-40 employees" },
-      { name: "Platinum (41-100 FTE)", annual_cost: "$1,250", description: "41-100 employees" },
-      { name: "Diamond (101+ FTE)", annual_cost: "$2,400", description: "101+ employees" },
-      { name: "Courtesy", annual_cost: "Reciprocal", description: "Pre-approved partners" },
-    ],
-
-    key_events: [
-      { name: "Anacortes Cuisine Scene", timing: "January – March 2026", description: "Themed monthly dining programs supporting local restaurants" },
-      { name: "State of the Chamber", timing: "February 12, 2026", description: "Annual meeting with strategic goals and economic outlook" },
-      { name: "Anacortes UNCORKED", timing: "March 7, 2026", description: "Premier wine and food event for shoulder season tourism" },
-      { name: "Waterfront Festival", timing: "June 2026", description: "Maritime heritage and boating community celebration" },
-      { name: "Anacortes Arts Festival", timing: "August 2026", description: "Large-scale festival attracting thousands to Commercial Avenue" },
-      { name: "Business After Hours", timing: "Periodic", description: "B2B networking events" },
-    ],
-
-    advocacy_priorities: [
-      "Highway 20 corridor preservation ($3M repairs)",
-      "Ferry service stabilization (WSF San Juan/Sidney routes)",
-      "Cap Sante Marina Event Facility ($500K capital request)",
-      "B&O tax reduction and restructuring for manufacturing",
-      "Climate Commitment Act modifications for refinery sector",
-      "Workforce housing and childcare capacity expansion",
-      "North Star behavioral health initiative",
-      "Indigent defense cost-sharing (HB 1592)",
-    ],
-
-    services: [
-      "Online business directory (~1M page views/year)",
-      "Visitor Information Center (VIC) brochure display",
-      "Experience Anacortes destination marketing",
-      "Vehicle and vessel licensing subagency",
-      "Hot Deals and job vacancy postings",
-      "Government Affairs Committee advocacy",
-      "Membership 101 orientations",
-    ],
-
-    regional_alliances: [
-      "Association of Washington Business (AWB)",
-      "Skagit Chamber Alliance",
-      "Economic Development Alliance of Skagit County (EDASC)",
-      "Port of Anacortes",
-      "Downtown Anacortes Alliance",
-      "City of Anacortes",
-    ],
-
-    data_quality: {
-      completeness_score: 85,
-      missing_fields: ["phone", "email", "founded_year", "office_hours", "board_chair name"],
-      needs_validation: ["website URL", "address current accuracy", "2026 tier prices (cents suggest fee+processing)"],
-    },
+    services: ["Leadership Institute", "Trades Initiative", "Networking"],
+    regional_alliances: ["South Sound Chamber of Commerce Legislative Coalition (SSCCLC)"],
+    data_quality: { completeness_score: 80, missing_fields: ["founded_year"], needs_validation: [] },
     imported_at: null,
     source_type: "google_doc_research_report",
+    coordinates: { lat: 47.3073, lng: -122.2285 }  // Auburn, WA
   },
-
   // ==========================================
-  // 3. BAINBRIDGE ISLAND CHAMBER OF COMMERCE
+  // 2. BATTLE GROUND CHAMBER (GREATER VANCOUVER)
   // ==========================================
   {
-    org_name: "Bainbridge Island Chamber of Commerce",
-    org_type: "501(c)(6) Non-Profit Business League",
-    founded_year: null, // Not stated
-    region: "Kitsap County / Puget Sound",
-    city: "Bainbridge Island",
+    org_name: "Battle Ground Chamber of Commerce",
+    org_type: "501(c)(6) Non-Profit",
+    founded_year: null,
+    region: "Clark County",
+    city: "Battle Ground",
     state: "WA",
-    zip_codes: ["98110"],
-    address: "395 Winslow Way E, Bainbridge Island, WA 98110",
-    phone: "", // Not found in research doc
-    website: "", // Not explicitly stated
-    email: "", // Not found in research doc
-    office_hours: "Mon-Fri 9:00 AM – 5:00 PM; Sat 10:00 AM – 2:00 PM (Visitor Center)",
-    google_doc_source: "https://docs.google.com/document/d/1TP5tiH7nedOoBVdNSw0qIQyZZ68u9BGQsv8c8hpJv0Q/edit",
-
-    executive: {
-      name: "Lindsay Browning",
-      title: "Executive Director",
-      since_year: null,
-    },
-    board_chair: {
-      name: "Bruce Eremic",
-      affiliation: "Kitsap Bank",
-    },
-    board_size: 11, // Chair + Treasurer + Secretary + Past Chair + Liaison + 6 Directors + 2 open
-    staff_count: 5,  // Lindsay, Rachel, Toni, Kris, Anna
-
-    member_count: 400, // "400+ members"
+    zip_codes: ["98604"],
+    address: "Battle Ground, WA",
+    phone: "",
+    website: "",
+    email: "",
+    office_hours: "",
+    google_doc_source: "https://docs.google.com/document/d/1ABDC73kIAfpZkxiZ1VG8B7tzKC6AWM8V-utk1Dqf4Vk/edit",
+    executive: { name: "Merged with GVC", title: "", since_year: 2018 },
+    board_chair: { name: "See GVC", affiliation: "" },
+    board_size: 0,
+    staff_count: 0,
+    member_count: null,
     membership_tiers: [
-      { name: "Standard (1-10 employees)", annual_cost: "$300 / $270 nonprofit", description: "Small business or nonprofit" },
-      { name: "Standard (11-50 employees)", annual_cost: "$600 / $540 nonprofit", description: "Mid-size business or nonprofit" },
-      { name: "Standard (51+ employees)", annual_cost: "$900 / contact for nonprofit", description: "Large business" },
-      { name: "Individual Agent", annual_cost: "$200", description: "Independent contractors under a parent member company" },
-      { name: "Artist, Artisan, Agriculture", annual_cost: "$150", description: "Creative economy and local food producers" },
-      { name: "Social Membership", annual_cost: "$150", description: "Retired, remote workers, community supporters" },
+      { name: "Basic/Nonprofit", annual_cost: "$490", description: "Entry level" },
+      { name: "Community Investor", annual_cost: "$21,200", description: "Top tier" }
     ],
-
-    key_events: [
-      { name: "Annual Meeting", timing: "Annual", description: "Business recognition and strategic communication" },
-    ],
-
-    advocacy_priorities: [
-      "SR 305 Day Road Roundabout ($2.5M funding gap)",
-      "Hybrid-electric fast ferry investment",
-      "Ferry terminal law enforcement for line-cutting",
-      "Sound to Olympics Trail and Meigs Park Connector",
-      "Email privacy legislation (Public Records Act exemption)",
-      "Opposing new employer taxes",
-      "Stabilizing Climate Commitment Act costs",
-      "Opposing REET increases for housing",
-      "$80K Economic Development Strategy contract with City",
-    ],
-
-    services: [
-      "Online business directory",
-      "Visitor Information Center (Winslow + ferry terminal)",
-      "Vehicle and vessel licensing subagency",
-      "Enhanced Membership marketing add-on (newsletter, social media)",
-      "Monthly community newsletter (53% open rate)",
-      "Affiliate partner discounts (Kitsap WiFi, PartnerSquare, Wright CFO)",
-      "SBDC and SCORE business counseling access",
-      "Bainbridge Creative District co-chair",
-    ],
-
-    regional_alliances: [
-      "Association of Washington Business (AWB)",
-      "Washington Association of Cities (AWC)",
-      "City of Bainbridge Island",
-      "Housing Resources Bainbridge",
-      "Small Business Development Center (SBDC)",
-      "SCORE Greater Seattle",
-    ],
-
-    data_quality: {
-      completeness_score: 80,
-      missing_fields: ["phone", "email", "website", "founded_year", "executive since_year"],
-      needs_validation: ["website URL", "member_count precision", "2 open board seats filled?"],
-    },
+    key_events: [],
+    advocacy_priorities: ["I-5 Bridge Replacement", "Lower Snake River Dams"],
+    services: ["Regional advocacy via GVC"],
+    regional_alliances: ["Greater Vancouver Chamber (GVC)"],
+    data_quality: { completeness_score: 70, missing_fields: ["founded_year"], needs_validation: ["Merged entity status"] },
     imported_at: null,
     source_type: "google_doc_research_report",
+    coordinates: { lat: 45.7813, lng: -122.5340 }  // Battle Ground, WA
   },
+  // ==========================================
+  // 3. BELLEVUE CHAMBER OF COMMERCE
+  // ==========================================
+  {
+    org_name: "Bellevue Chamber of Commerce",
+    org_type: "501(c)(6) Non-Profit",
+    founded_year: null,
+    region: "King County",
+    city: "Bellevue",
+    state: "WA",
+    zip_codes: ["98004", "98005", "98006", "98007", "98008", "98009", "98015"],
+    address: "Bellevue, WA",
+    phone: "",
+    website: "https://www.bellevuechamber.org",
+    email: "",
+    office_hours: "",
+    google_doc_source: "https://docs.google.com/document/d/1vHhRYi_lHHedJIRTkuXJUJNbqfVAwvnm1v-HM5RaDDw/edit",
+    executive: { name: "Joe Fain", title: "President & CEO", since_year: null },
+    board_chair: { name: "Pearl Leung", affiliation: "Amazon" },
+    board_size: 0,
+    staff_count: 0,
+    member_count: null,
+    membership_tiers: [
+      { name: "Starter", annual_cost: "Variable", description: "Entry level" },
+      { name: "Enterprise", annual_cost: "Variable", description: "Top tier" }
+    ],
+    key_events: [],
+    advocacy_priorities: ["Oppose Income Tax", "Housing Supply", "Regional Mobility"],
+    services: ["Executive Business Roundtable (EBRT)", "Policy Council"],
+    regional_alliances: ["East King Chambers Coalition (EKCC)"],
+    data_quality: { completeness_score: 90, missing_fields: [], needs_validation: [] },
+    imported_at: null,
+    source_type: "google_doc_research_report",
+    coordinates: { lat: 47.6101, lng: -122.2015 }  // Bellevue, WA
+  },
+  // ==========================================
+  // 4. BENTON CITY CHAMBER OF COMMERCE
+  // ==========================================
+  {
+    org_name: "Benton City Chamber of Commerce",
+    org_type: "501(c)(6) Non-Profit",
+    founded_year: null,
+    region: "Benton County",
+    city: "Benton City",
+    state: "WA",
+    zip_codes: ["99320"],
+    address: "513 9th Street, Benton City, WA",
+    phone: "",
+    website: "",
+    email: "",
+    office_hours: "",
+    google_doc_source: "https://docs.google.com/document/d/1VMUHqrPZdo7bQ4RmuuO77z87jIg8GSbxFED4F34tv1o/edit",
+    executive: { name: "Shara Morgan", title: "President", since_year: 2025 },
+    board_chair: { name: "Shara Morgan", affiliation: "" },
+    board_size: 0,
+    staff_count: 0,
+    member_count: null,
+    membership_tiers: [
+      { name: "Associate", annual_cost: "$20", description: "Individual" },
+      { name: "Corporate/Municipal", annual_cost: "$350", description: "Large entity" }
+    ],
+    key_events: [
+      { name: "Benton City Daze", timing: "Sept 12-13", description: "Community festival" },
+      { name: "Winterfest", timing: "Dec 12", description: "Holiday event" }
+    ],
+    advocacy_priorities: ["Infrastructure", "River Safety"],
+    services: ["Visitor Information Center", "Scholarships", "Blessing Boxes"],
+    regional_alliances: ["Three Rivers Alliance"],
+    data_quality: { completeness_score: 85, missing_fields: [], needs_validation: [] },
+    imported_at: null,
+    source_type: "google_doc_research_report",
+    coordinates: { lat: 46.2627, lng: -119.4875 }  // Benton City, WA
+  },
+  // ==========================================
+  // 5. GREATER KITSAP CHAMBER
+  // ==========================================
+  {
+    org_name: "Greater Kitsap Chamber",
+    org_type: "501(c)(6) Non-Profit",
+    founded_year: 2022,
+    region: "Kitsap Peninsula",
+    city: "Silverdale",
+    state: "WA",
+    zip_codes: [],
+    address: "Silverdale & Bremerton offices",
+    phone: "",
+    website: "",
+    email: "",
+    office_hours: "",
+    google_doc_source: "https://docs.google.com/document/d/1WlIl6R2WmqMbBrkmBZmr6N0ewLzTObILmcqloiL9998/edit",
+    executive: { name: "Irene Moyer", title: "President & CEO", since_year: null },
+    board_chair: { name: "Susan Larsen", affiliation: "Land Title Company" },
+    board_size: 0,
+    staff_count: 2,
+    member_count: null,
+    membership_tiers: [
+      { name: "Business", annual_cost: "$350", description: "Basic access" },
+      { name: "Main Street", annual_cost: "$735", description: "Marketing focus" },
+      { name: "Growth", annual_cost: "$1,575", description: "Executive access" },
+      { name: "Community Connector", annual_cost: "$2,625", description: "Leadership council" },
+      { name: "Stakeholder", annual_cost: "$5,000", description: "Regional positioning" }
+    ],
+    key_events: [
+      { name: "Legislative Day", timing: "Annual", description: "Advocacy and policy event" },
+      { name: "Gala Garden Show", timing: "Annual", description: "Community garden show" }
+    ],
+    advocacy_priorities: ["SR 3 Gorst Widening", "Ferry Service", "Housing"],
+    services: ["Visitor Center", "Networking"],
+    regional_alliances: ["AWB", "KEDA"],
+    data_quality: { completeness_score: 90, missing_fields: [], needs_validation: [] },
+    imported_at: null,
+    source_type: "google_doc_research_report",
+    coordinates: { lat: 47.6436, lng: -122.6923 }  // Silverdale, WA
+  },
+  // ==========================================
+  // 6. BUCKLEY CHAMBER OF COMMERCE
+  // ==========================================
+  {
+    org_name: "Buckley Chamber of Commerce",
+    org_type: "501(c)(6) Non-Profit",
+    founded_year: null,
+    region: "Pierce County",
+    city: "Buckley",
+    state: "WA",
+    zip_codes: ["98321"],
+    address: "P.O. Box 168, Buckley, WA",
+    phone: "(360) 829-0975",
+    website: "buckleychamber.com",
+    email: "",
+    office_hours: "",
+    google_doc_source: "https://docs.google.com/document/d/1-eXlt-hdKgIbmPv7j7BXD4AL4e044kKXzvCIY_4Zo8g/edit",
+    executive: { name: "Taylor Stark", title: "President", since_year: 2026 },
+    board_chair: { name: "Taylor Stark", affiliation: "" },
+    board_size: 7,
+    staff_count: 0,
+    member_count: null,
+    membership_tiers: [],
+    key_events: [
+      { name: "Log Show Parade", timing: "June", description: "Heritage festival" },
+      { name: "Little Nashville Wine Walk", timing: "September", description: "Downtown event" }
+    ],
+    advocacy_priorities: ["Fiscal Responsibility", "SR 410 Zoning"],
+    services: ["Reader Board Marketing", "Networking"],
+    regional_alliances: ["City of Buckley", "White River School District"],
+    data_quality: { completeness_score: 85, missing_fields: [], needs_validation: [] },
+    imported_at: null,
+    source_type: "google_doc_research_report",
+    coordinates: { lat: 47.1622, lng: -122.0262 }  // Buckley, WA
+  },
+  // ==========================================
+  // 7. BURLINGTON CHAMBER OF COMMERCE
+  // ==========================================
+  {
+    org_name: "Burlington Chamber of Commerce",
+    org_type: "501(c)(6) Non-Profit",
+    founded_year: null,
+    region: "Skagit County",
+    city: "Burlington",
+    state: "WA",
+    zip_codes: ["98233"],
+    address: "520 E Fairhaven Ave, Burlington, WA",
+    phone: "",
+    website: "",
+    email: "",
+    office_hours: "",
+    google_doc_source: "https://docs.google.com/document/d/1X5DGEH2Fq2eHSDNhniFSBm2bz8TKW4Dvd7BFOVl-isA/edit",
+    executive: { name: "Stephanie Rees", title: "President & CEO", since_year: null },
+    board_chair: { name: "Lisa Case", affiliation: "" },
+    board_size: 0,
+    staff_count: 0,
+    member_count: null,
+    membership_tiers: [
+      { name: "Business", annual_cost: "$350", description: "Entry level" },
+      { name: "Leader", annual_cost: "$10,000", description: "Top tier" }
+    ],
+    key_events: [
+      { name: "Berry Dairy Days", timing: "June", description: "Heritage festival" }
+    ],
+    advocacy_priorities: ["Housing", "Childcare", "Infrastructure"],
+    services: ["Ambassador Committee"],
+    regional_alliances: ["Skagit Chamber Alliance"],
+    data_quality: { completeness_score: 85, missing_fields: [], needs_validation: [] },
+    imported_at: null,
+    source_type: "google_doc_research_report",
+    coordinates: { lat: 48.4759, lng: -122.3255 }  // Burlington, WA
+  },
+  // ==========================================
+  // 8. CAMAS-WASHOUGAL CHAMBER OF COMMERCE
+  // ==========================================
+  {
+    org_name: "Camas-Washougal Chamber of Commerce",
+    org_type: "501(c)(6) Non-Profit",
+    founded_year: null,
+    region: "Clark County",
+    city: "Camas",
+    state: "WA",
+    zip_codes: [],
+    address: "Camas, WA",
+    phone: "",
+    website: "",
+    email: "",
+    office_hours: "",
+    google_doc_source: "https://docs.google.com/document/d/1OpM08VETzVWNHVHQFqyFaEdCzmH1vYlGLSY2XlufG1s/edit",
+    executive: { name: "Jennifer Senescu", title: "Executive Director", since_year: null },
+    board_chair: { name: "See Board List", affiliation: "" },
+    board_size: 5,
+    staff_count: 1,
+    member_count: null,
+    membership_tiers: [
+      { name: "Starter", annual_cost: "Variable", description: "Micro-business" },
+      { name: "Community Leader", annual_cost: "Variable", description: "Corporate" }
+    ],
+    key_events: [
+      { name: "State of the Cities", timing: "Annual", description: "Mayor address" }
+    ],
+    advocacy_priorities: ["Workforce Housing", "B&O Tax Relief"],
+    services: ["Scholarships", "Networking"],
+    regional_alliances: ["Downtown Camas Association", "Port of Camas-Washougal"],
+    data_quality: { completeness_score: 85, missing_fields: [], needs_validation: [] },
+    imported_at: null,
+    source_type: "google_doc_research_report",
+    coordinates: { lat: 45.5887, lng: -122.3996 }  // Camas, WA
+  },
+  // ==========================================
+  // 9. CARNATION CHAMBER OF COMMERCE
+  // ==========================================
+  {
+    org_name: "Carnation Chamber of Commerce",
+    org_type: "501(c)(6) Non-Profit",
+    founded_year: null,
+    region: "Snoqualmie Valley",
+    city: "Carnation",
+    state: "WA",
+    zip_codes: ["98014"],
+    address: "Carnation, WA",
+    phone: "",
+    website: "",
+    email: "",
+    office_hours: "",
+    google_doc_source: "https://docs.google.com/document/d/1vsj2xaD0V_U1Na5WT2NMYIk7frbDd7WJ5OA6alaX154/edit",
+    executive: { name: "Debbie Green", title: "President", since_year: 2026 },
+    board_chair: { name: "Debbie Green", affiliation: "" },
+    board_size: 0,
+    staff_count: 0,
+    member_count: null,
+    membership_tiers: [
+      { name: "Member", annual_cost: "$110", description: "Flat rate universal membership" }
+    ],
+    key_events: [
+      { name: "Sunflower Festival", timing: "Aug-Sept", description: "Agri-tourism event" },
+      { name: "Christmas in Carnation", timing: "December", description: "Holiday event" }
+    ],
+    advocacy_priorities: ["Flood Resilience", "Ag Protection", "SR 203 Safety"],
+    services: ["Networking"],
+    regional_alliances: ["City of Carnation"],
+    data_quality: { completeness_score: 80, missing_fields: [], needs_validation: [] },
+    imported_at: null,
+    source_type: "google_doc_research_report",
+    coordinates: { lat: 47.6493, lng: -121.9128 }  // Carnation, WA
+  },
+  // ==========================================
+  // 10. COUPEVILLE CHAMBER (Central Whidbey)
+  // ==========================================
+  {
+    org_name: "Central Whidbey Chamber of Commerce",
+    org_type: "501(c)(6) Non-Profit",
+    founded_year: null,
+    region: "Whidbey Island",
+    city: "Coupeville",
+    state: "WA",
+    zip_codes: ["98239"],
+    address: "Coupeville, WA",
+    phone: "",
+    website: "",
+    email: "",
+    office_hours: "",
+    google_doc_source: "https://docs.google.com/document/d/1VrgjqOMoIR3HXZDWfUuYVmtBQytKgCvPr3JVBZ5iwq0/edit",
+    executive: { name: "Lynda Eccles", title: "Executive Director", since_year: null },
+    board_chair: { name: "See Board List", affiliation: "" },
+    board_size: 0,
+    staff_count: 1,
+    member_count: null,
+    membership_tiers: [],
+    key_events: [
+      { name: "Penn Cove Musselfest", timing: "March", description: "Major tourism event" }
+    ],
+    advocacy_priorities: ["Ferry Restoration", "Tourism Management"],
+    services: ["Destination Management"],
+    regional_alliances: ["Island County", "Town of Coupeville"],
+    data_quality: { completeness_score: 85, missing_fields: [], needs_validation: [] },
+    imported_at: null,
+    source_type: "google_doc_research_report",
+    coordinates: { lat: 48.2198, lng: -122.6861 }  // Coupeville, WA
+  }
 ];
 
-  // --- MAIN ---
+// --- MAIN ---
 async function main() {
   const env = loadEnv();
-  const firebaseConfig = {
-    apiKey: env.VITE_FIREBASE_API_KEY,
-    authDomain: env.VITE_FIREBASE_AUTH_DOMAIN,
-    projectId: env.VITE_FIREBASE_PROJECT_ID,
-    storageBucket: env.VITE_FIREBASE_STORAGE_BUCKET,
-    messagingSenderId: env.VITE_FIREBASE_MESSAGING_SENDER_ID,
-    appId: env.VITE_FIREBASE_APP_ID,
-  };
+  // In emulator mode, we MUST use the same project ID that the Functions emulator
+  // registered triggers under (from .firebaserc "default" project). Otherwise,
+  // Firestore triggers won't fire because the emulator matches on project ID.
+  const EMULATOR_PROJECT = 'ama-ecosystem-prod'; // matches .firebaserc default
+  const isEmulator = !!process.env.FIRESTORE_EMULATOR_HOST;
+  const projectId = isEmulator ? EMULATOR_PROJECT : env.VITE_FIREBASE_PROJECT_ID;
 
-  const app = initializeApp(firebaseConfig);
+  // Admin SDK uses Application Default Credentials (ADC) in production.
+  // - Locally: run `gcloud auth application-default login` once.
+  // - On GCP (Cloud Run, Functions): credentials are automatic.
+  // - Emulator: no credentials needed, FIRESTORE_EMULATOR_HOST overrides.
+  const appConfig: Record<string, any> = { projectId };
+  if (!isEmulator) {
+    appConfig.credential = applicationDefault();
+  }
+  const app = initializeApp(appConfig);
   const db = getFirestore(app);
 
+  if (isEmulator) {
+    console.log(`[Seed Script] 🧪 EMULATOR MODE — Firestore at ${process.env.FIRESTORE_EMULATOR_HOST}`);
+  } else {
+    console.log(`[Seed Script] 🚀 PRODUCTION MODE — Using ADC for project: ${projectId}`);
+  }
+
   console.log('=== Cloud Agent: Seeding organizations ===');
-  console.log('Project:', firebaseConfig.projectId);
+  console.log('Project:', projectId);
 
   // Set a global timeout to prevent hanging forever
   const timeoutId = setTimeout(() => {
@@ -381,7 +506,7 @@ async function main() {
   try {
     for (const org of organizations) {
       console.log(`  Attempting to seed: ${org.org_name}...`);
-      
+
       // Generate a URL-safe doc ID from the name
       const docId = org.org_name
         .toLowerCase()
@@ -390,8 +515,8 @@ async function main() {
 
       org.imported_at = Timestamp.now();
 
-      const docRef = doc(db, 'organizations', docId);
-      await setDoc(docRef, org);
+      const docRef = db.collection('organizations').doc(docId);
+      await docRef.set(org, { merge: true });
       console.log(`  ✅ Success: ${org.org_name} → organizations/${docId}`);
     }
 
@@ -415,7 +540,8 @@ async function main() {
   } catch (err: any) {
     console.error('\n❌ Fatal seeding error:', err.message);
     if (err.code === 'permission-denied') {
-      console.error('   Check Firestore security rules for allow write: if true;');
+      console.error('   Ensure your ADC credentials have Firestore write permissions.');
+      console.error('   Run: gcloud auth application-default login');
     }
     process.exit(1);
   }
