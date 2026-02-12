@@ -1,5 +1,6 @@
 import path from 'path';
 import { defineConfig, loadEnv } from 'vite';
+import { visualizer } from 'rollup-plugin-visualizer';
 import react from '@vitejs/plugin-react';
 
 export default defineConfig(({ mode }) => {
@@ -7,12 +8,32 @@ export default defineConfig(({ mode }) => {
   return {
     server: {
       port: 3000,
-      host: '0.0.0.0',
+      host: 'localhost',
     },
-    plugins: [react()],
+    plugins: [
+      react(),
+      visualizer({
+        open: false,
+        gzipSize: true,
+        brotliSize: true,
+      }),
+    ],
+    build: {
+      target: 'esnext',
+      minify: 'esbuild',
+      rollupOptions: {
+        output: {
+          manualChunks: {
+            'vendor-react': ['react', 'react-dom', 'react-router-dom'],
+            'vendor-firebase': ['firebase/app', 'firebase/auth', 'firebase/firestore', 'firebase/functions'],
+            'vendor-ui': ['lucide-react', 'framer-motion'],
+          },
+        },
+      },
+    },
     define: {
-      'process.env.API_KEY': JSON.stringify(env.GEMINI_API_KEY),
-      'process.env.GEMINI_API_KEY': JSON.stringify(env.GEMINI_API_KEY)
+      // SEC-2 FIX: API keys must NOT be injected into the client bundle.
+      // Use Cloud Functions for any server-side AI operations.
     },
     resolve: {
       alias: {

@@ -10,8 +10,10 @@
     "audit:drift": "node scripts/audit-drift.js"
   },
   "dependencies": {
-    "@google/genai": "^1.40.0",
+    "@tanstack/react-query": "^5.90.21",
+    "@vis.gl/react-google-maps": "^1.7.1",
     "firebase": "^12.9.0",
+    "framer-motion": "^12.34.0",
     "lucide-react": "^0.563.0",
     "react": "^19.2.4",
     "react-dom": "^19.2.4",
@@ -19,12 +21,14 @@
   },
   "devDependencies": {
     "@types/dotenv": "^6.1.1",
+    "@types/leaflet": "^1.9.21",
     "@types/node": "^22.14.0",
     "@vitejs/plugin-react": "^5.0.0",
     "autoprefixer": "^10.4.24",
     "dotenv": "^17.2.4",
-    "framer-motion": "^12.34.0",
+    "firebase-admin": "^13.6.1",
     "postcss": "^8.5.6",
+    "rollup-plugin-visualizer": "^6.0.5",
     "tailwindcss": "^3.4.17",
     "tsx": "^4.21.0",
     "typescript": "~5.8.2",
