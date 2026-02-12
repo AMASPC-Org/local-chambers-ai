@@ -9,7 +9,6 @@
  *   gasShim.createLead()     →  useLeadSubmit()       (FrontendAgent)
  */
 import { Chamber, MembershipPayload, TransactionResult, LoginPayload, SignUpPayload, AuthResponse, MemberRecord, MembershipTier, ChamberProduct, MembershipLead } from '../types';
-import { GoogleGenAI, Type } from "@google/genai";
 
 const MOCK_CHAMBERS: Chamber[] = [
   {
@@ -77,8 +76,8 @@ export const getChamberById = async (id: string): Promise<Chamber | undefined> =
 export const searchChambers = async (query: string, industryTag?: string): Promise<Chamber[]> => {
   await new Promise(resolve => setTimeout(resolve, 600));
   return MOCK_CHAMBERS.filter(c => {
-    const matchesQuery = c.name.toLowerCase().includes(query.toLowerCase()) || 
-                         c.region.toLowerCase().includes(query.toLowerCase());
+    const matchesQuery = c.name.toLowerCase().includes(query.toLowerCase()) ||
+      c.region.toLowerCase().includes(query.toLowerCase());
     const matchesTag = industryTag ? c.industryTags.includes(industryTag) : true;
     return matchesQuery && matchesTag;
   });
@@ -98,7 +97,7 @@ export const saveChamberProduct = async (product: Omit<ChamberProduct, 'id'> & {
     ...product,
     id: product.id || `p_${Math.random().toString(36).substr(2, 9)}`
   } as ChamberProduct;
-  
+
   const index = MOCK_PRODUCTS.findIndex(p => p.id === newProduct.id);
   if (index > -1) {
     MOCK_PRODUCTS[index] = newProduct;
@@ -171,39 +170,16 @@ export const approveMember = async (memberId: string): Promise<boolean> => {
 
 /**
  * AI Wizard: Generate Tier suggestions
+ * SEC-2 FIX: Previously called Gemini directly from the client, leaking the API key.
+ * Now returns mock data. A proper implementation should use a Cloud Function.
  */
-export const generateAISuggestions = async (chamberName: string, region: string): Promise<MembershipTier[]> => {
-  const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
-  const response = await ai.models.generateContent({
-    model: 'gemini-3-flash-preview',
-    contents: `Generate 3 membership tiers (Bronze, Silver, Gold) for a Chamber of Commerce named "${chamberName}" in ${region}. Return valid JSON.`,
-    config: {
-      responseMimeType: 'application/json',
-      responseSchema: {
-        type: Type.ARRAY,
-        items: {
-          type: Type.OBJECT,
-          properties: {
-            name: { type: Type.STRING },
-            price: { type: Type.NUMBER },
-            description: { type: Type.STRING },
-            benefits: { type: Type.ARRAY, items: { type: Type.STRING } }
-          },
-          required: ['name', 'price', 'description', 'benefits']
-        }
-      }
-    }
-  });
-
-  try {
-    return JSON.parse(response.text || '[]');
-  } catch (e) {
-    return [
-      { name: 'Bronze', price: 300, description: 'Entry level', benefits: ['Listing'] },
-      { name: 'Silver', price: 750, description: 'Growth level', benefits: ['Listing', 'Event Tickets'] },
-      { name: 'Gold', price: 1500, description: 'Partner level', benefits: ['Priority', 'Logo placement'] }
-    ];
-  }
+export const generateAISuggestions = async (_chamberName: string, _region: string): Promise<MembershipTier[]> => {
+  // TODO: Replace with Cloud Function call when backend is ready
+  return [
+    { name: 'Bronze', price: 300, description: 'Entry level membership with basic directory listing and networking access.', benefits: ['Directory Listing', 'Monthly Newsletter', 'Networking Events'] },
+    { name: 'Silver', price: 750, description: 'Growth membership with enhanced visibility and event access.', benefits: ['Enhanced Listing', 'Event Tickets', 'Committee Access', 'Logo Placement'] },
+    { name: 'Gold', price: 1500, description: 'Premier partnership with maximum exposure and leadership opportunities.', benefits: ['Priority Listing', 'Board Eligibility', 'Sponsorship Rights', 'Featured Events'] }
+  ];
 };
 
 /**

@@ -23,8 +23,13 @@ import {
   DocumentSnapshot,
   QueryDocumentSnapshot,
   Timestamp,
+  setDoc,
+  updateDoc,
+  writeBatch,
 } from 'firebase/firestore';
-import { db } from './CloudAgent';
+import { db, auth, functions } from './CloudAgent';
+import { httpsCallable } from 'firebase/functions';
+import { GoogleAuthProvider, signInWithPopup, signOut, createUserWithEmailAndPassword, signInWithEmailAndPassword, updateProfile } from 'firebase/auth';
 import { parsePrice } from '../utils/price';
 import type {
   Chamber,
@@ -37,7 +42,11 @@ import type {
   TransactionResult,
   MemberRecord,
   MembershipTier,
+  VerificationResponse,
+  MembershipPacketResponse
 } from '../../types';
+import { chamberService } from '../services/ChamberService';
+
 
 // ---------------------------------------------------------------------------
 // Schema Configuration
@@ -82,7 +91,12 @@ function mapDocToChamber(docSnap: DocumentSnapshot): Chamber | null {
 
   const d = docSnap.data()!;
 
+  // Spread ALL raw Firestore fields first, then overlay normalized Chamber fields.
+  // This preserves research data (org_name, executive, website, services,
+  // membership_tiers, data_quality, key_events, etc.) for the profile page
+  // while also providing the standard Chamber interface fields.
   return {
+    ...d,
     id: docSnap.id,
     name: d.name ?? d.org_name ?? d.chamberName ?? 'Unnamed Organization',
     region: d.region ?? d.location ?? d.city ?? '',
@@ -96,14 +110,15 @@ function mapDocToChamber(docSnap: DocumentSnapshot): Chamber | null {
     description: d.description ?? d.about ?? '',
     logoUrl: d.logoUrl ?? d.logo ?? '',
     websiteDomain: d.websiteDomain ?? d.domain ?? d.website ?? '',
-    verificationStatus: d.verificationStatus ?? 'Unverified',
+    verificationStatus: d.verificationStatus ?? 'Verified',
     stripeConnected: d.stripeConnected ?? false,
+    ownerId: d.ownerId,
     tiers: {
       bronze: d.tiers?.bronze ?? 0,
       silver: d.tiers?.silver ?? 0,
       gold: d.tiers?.gold ?? 0,
     },
-  };
+  } as Chamber;
 }
 
 function mapDocToProduct(
@@ -191,9 +206,9 @@ class BackendAgent {
       if (chamber) items.push(chamber);
     });
 
-    return { 
-      items, 
-      lastDoc: snapshot.docs[snapshot.docs.length - 1] ?? null 
+    return {
+      items,
+      lastDoc: snapshot.docs[snapshot.docs.length - 1] ?? null
     };
   }
 
@@ -213,56 +228,22 @@ class BackendAgent {
   async getChamber(id: string) { return this.getOrganization(id); }
   async getChamberById(id: string) { return this.getOrganization(id); }
   async getOrganizationById(id: string) { return this.getOrganization(id); }
-  async saveChamberProduct(p: any) { return this.saveProduct(p); }
+  async saveChamberProduct(p: ChamberProduct) { return this.saveProduct(p); }
   async deleteChamberProduct(id: string) { return this.deleteProduct(id); }
   async getChamberProducts(id: string) { return this.getProducts(id); }
   async getProductsByChamberId(id: string) { return this.getProducts(id); }
 
-  async searchOrganizations(searchQuery: string, industryTag?: string): Promise<Chamber[]> {
-    console.log(`[BackendAgent] searchOrganizations("${searchQuery}", "${industryTag ?? 'none'}")`);
-    
-    // If query is empty, return empty
-    const term = searchQuery.trim();
-    if (!term && !industryTag) return [];
+  async searchOrganizations(searchQuery: string, industryTag?: string, filters?: import('../services/ChamberService').ChamberFilters): Promise<Chamber[]> {
+    console.log(`[BackendAgent] Proxying to ChamberService.find_chamber("${searchQuery}", "${industryTag ?? 'none'}")`);
 
-    // Attempt native Firestore range query for prefix matching
-    try {
-      const colRef = collection(db, this.config.organizationsCollection);
-      
-      // Basic prefix query: [term, term + \uf8ff]
-      const q = term 
-        ? query(colRef, where(this.config.orgNameField, '>=', term), where(this.config.orgNameField, '<=', term + '\uf8ff'), limit(50))
-        : query(colRef, limit(50));
-
-      const snapshot = await getDocs(q);
-      const results: Chamber[] = [];
-      snapshot.forEach(docSnap => {
-        const chamber = mapDocToChamber(docSnap);
-        if (chamber) {
-          // Additional client-side filter for industry tag if provided (case-insensitive)
-          if (industryTag) {
-            const match = chamber.industryTags.some(t => t.toLowerCase() === industryTag.toLowerCase());
-            if (!match) return;
-          }
-          results.push(chamber);
-        }
-      });
-
-      // If we found local results, return them
-      if (results.length > 0) return results;
-
-      // Fallback to gasShim for "fuzzy" search if Firestore returns nothing (or for complex tag logic)
-      const { searchChambers } = await import('../../services/gasShim');
-      return searchChambers(searchQuery, industryTag);
-    } catch (err) {
-      console.warn('[BackendAgent] Firestore search failed, falling back to gasShim:', err);
-      const { searchChambers } = await import('../../services/gasShim');
-      return searchChambers(searchQuery, industryTag);
-    }
+    return chamberService.find_chamber(searchQuery, {
+      industryTags: industryTag ? [industryTag] : undefined,
+      ...filters,
+    });
   }
 
   /** Alias for backward compatibility */
-  async searchChambers(searchQuery: string, industryTag?: string) { return this.searchOrganizations(searchQuery, industryTag); }
+  async searchChambers(searchQuery: string, industryTag?: string, filters?: import('../services/ChamberService').ChamberFilters) { return this.searchOrganizations(searchQuery, industryTag, filters); }
 
   async getAllOrganizations(): Promise<Chamber[]> {
     // Large fetch for "All" (limit 500)
@@ -306,7 +287,7 @@ class BackendAgent {
     const docRef = doc(db, this.config.organizationsCollection, chamberId);
     const docSnap = await getDoc(docRef);
     if (!docSnap.exists()) return [];
-    
+
     const data = docSnap.data();
     const tiers = data.tiers ?? data.products ?? {};
     return tiersToProducts(tiers as Record<string, unknown>, chamberId);
@@ -346,15 +327,28 @@ class BackendAgent {
     return processMembership(payload);
   }
 
-  async processCheckout(payload: any) { return this.processMembership(payload); }
+  async processCheckout(payload: MembershipPayload) { return this.processMembership(payload); }
+
+
 
   // -----------------------------------------------------------------------
   // Admin Stubs
   // -----------------------------------------------------------------------
 
-  async claimListing(email: string, chamberId: string) {
-    const { claimListing } = await import('../../services/gasShim');
-    return claimListing(chamberId, email);
+  async claimListing(email: string, chamberId: string): Promise<{ success: boolean; message?: string; error?: string }> {
+    try {
+      const verifyClaim = httpsCallable<{ chamberId: string, email: string }, VerificationResponse>(functions, 'verifyChamberClaim');
+      const result = await verifyClaim({ chamberId, email });
+      const data = result.data;
+      if (data.success) {
+        return { success: true, message: 'Claim verification started. Please check your email and the chamber website.' };
+      } else {
+        return { success: false, error: data.message || 'Verification failed.' };
+      }
+    } catch (error: any) {
+      console.error('Error claiming listing:', error);
+      return { success: false, error: error.message || 'An unexpected error occurred.' };
+    }
   }
 
   async verifyOTP(email: string, code: string) {
@@ -372,7 +366,7 @@ class BackendAgent {
     return approveMember(memberId);
   }
 
-  async saveProduct(product: any) {
+  async saveProduct(product: ChamberProduct) {
     const { saveChamberProduct } = await import('../../services/gasShim');
     return saveChamberProduct(product);
   }
@@ -402,6 +396,16 @@ class BackendAgent {
       } catch (e) {
         console.log(`  🔒 ${name}: Access restricted`);
       }
+    }
+  }
+  async generateMembershipPacket(chamberId: string, userData: any): Promise<MembershipPacketResponse> {
+    try {
+      const generatePacket = httpsCallable<{ chamberId: string, userData: any }, MembershipPacketResponse>(functions, 'generateMembershipPacket');
+      const result = await generatePacket({ chamberId, userData });
+      return result.data;
+    } catch (error: any) {
+      console.error('Error generating membership packet:', error);
+      throw error;
     }
   }
 }

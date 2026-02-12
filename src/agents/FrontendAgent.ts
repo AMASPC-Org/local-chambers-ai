@@ -1,10 +1,10 @@
 import { useState, useEffect, useCallback } from 'react';
 import { backendAgent } from './BackendAgent';
-import type { 
-  Chamber, 
-  MembershipLead, 
-  LoginPayload, 
-  SignUpPayload, 
+import type {
+  Chamber,
+  MembershipLead,
+  LoginPayload,
+  SignUpPayload,
   MembershipPayload,
   ChamberProduct
 } from '../../types';
@@ -24,7 +24,7 @@ export function useOrganizations(pageSize: number = 10) {
     setLoading(true);
     try {
       const result = await backendAgent.getOrganizations(pageSize, isNextPage ? lastDoc : undefined);
-      
+
       if (isNextPage) {
         setChambers(prev => [...prev, ...result.items]);
       } else {
@@ -128,6 +128,7 @@ export function useLead() {
 
 /**
  * Hook for searching organizations
+ * @deprecated Use `useChambers` with React Query instead.
  */
 export function useSearch() {
   const [results, setResults] = useState<Chamber[]>([]);
@@ -218,29 +219,29 @@ export function useAdminMembers(chamberId?: string) {
     const loadData = async () => {
       setLoading(true);
       try {
-         const [c, m] = await Promise.all([
-           backendAgent.getChamberById(chamberId),
-           backendAgent.getMembersByChamberId(chamberId)
-         ]);
-         setChamber(c);
-         setMembers(m);
+        const [c, m] = await Promise.all([
+          backendAgent.getChamberById(chamberId),
+          backendAgent.getMembersByChamberId(chamberId)
+        ]);
+        setChamber(c);
+        setMembers(m);
       } catch (err) {
-         console.error(err);
+        console.error(err);
       } finally {
-         setLoading(false);
+        setLoading(false);
       }
     };
     loadData();
   }, [chamberId]);
 
   const approve = async (memberId: string) => {
-     setProcessingId(memberId);
-     try {
-        await backendAgent.approveMember(memberId);
-        setMembers(prev => prev.map(m => m.id === memberId ? { ...m, status: 'Active' } : m));
-     } finally {
-        setProcessingId(null);
-     }
+    setProcessingId(memberId);
+    try {
+      await backendAgent.approveMember(memberId);
+      setMembers(prev => prev.map(m => m.id === memberId ? { ...m, status: 'Active' } : m));
+    } finally {
+      setProcessingId(null);
+    }
   };
 
   return { chamber, members, loading, approve, processingId };
@@ -260,40 +261,40 @@ export function useChamberProducts(chamberId?: string) {
     const loadData = async () => {
       setLoading(true);
       try {
-         const [c, p] = await Promise.all([
-           backendAgent.getChamberById(chamberId),
-           backendAgent.getProductsByChamberId(chamberId)
-         ]);
-         setChamber(c);
-         setProducts(p as any[]);
+        const [c, p] = await Promise.all([
+          backendAgent.getChamberById(chamberId),
+          backendAgent.getProductsByChamberId(chamberId)
+        ]);
+        setChamber(c);
+        setProducts(p as any[]);
       } catch (err) {
-         console.error(err);
+        console.error(err);
       } finally {
-         setLoading(false);
+        setLoading(false);
       }
     };
     loadData();
   }, [chamberId]);
 
   const save = async (product: any) => {
-     setSaving(true);
-     try {
-        const result = await backendAgent.saveProduct(product);
-        if (!product.id || product.id.startsWith('temp_')) {
-           setProducts(prev => prev.map(p => p.id === product.id ? { ...p, id: result.id } : p));
-        }
-     } finally {
-        setSaving(false);
-     }
+    setSaving(true);
+    try {
+      const result = await backendAgent.saveProduct(product);
+      if (!product.id || product.id.startsWith('temp_')) {
+        setProducts(prev => prev.map(p => p.id === product.id ? { ...p, id: result.id } : p));
+      }
+    } finally {
+      setSaving(false);
+    }
   };
 
   const remove = async (productId: string) => {
-     try {
-        await backendAgent.deleteProduct(productId);
-        setProducts(prev => prev.filter(p => p.id !== productId));
-     } catch (err) {
-        console.error(err);
-     }
+    try {
+      await backendAgent.deleteProduct(productId);
+      setProducts(prev => prev.filter(p => p.id !== productId));
+    } catch (err) {
+      console.error(err);
+    }
   };
 
   return { chamber, products, setProducts, loading, saving, save, remove };
