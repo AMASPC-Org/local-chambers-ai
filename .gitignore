@@ -29,4 +29,25 @@ service-account.json
 *.sln
 *.sw?
 
+# AMA Specific
 test-output.txt
+test-output-2.txt
+seed_output.txt
+seed_output2.txt
+verify_output.txt
+verify_output2.txt
+stats.html
+debug_tail.txt
+fs_trigger_logs.txt
+project_logs.txt
+trigger_logs.txt
+trigger_log2.txt
+tsc-check*.txt
+tsc-final*.txt
+tsc-output.txt
+build-final.txt
+build.log
+build_error.log
+*.rules.bak
+credentials/
+.antigravity/
