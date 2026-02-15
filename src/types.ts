@@ -95,6 +95,8 @@ export interface TransactionResult {
   membership_status: MembershipStatus;
   message?: string;
   invoiceId?: string;
+  checkoutUrl?: string;
+  sessionId?: string;
 }
 
 export interface LoginPayload {

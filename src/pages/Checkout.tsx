@@ -6,11 +6,11 @@ import { CreditCard, FileText, Lock, Loader2, CheckCircle, ChevronLeft } from 'l
 
 export const Checkout: React.FC = () => {
   const location = useLocation();
-  const state = location.state as { 
-    chamberId: string; 
+  const state = location.state as {
+    chamberId: string;
     chamberName: string;
-    tier: string; 
-    amount: number; 
+    tier: string;
+    amount: number;
     isNonProfit: boolean;
     paymentMethod?: 'Card' | 'Invoice';
   } | undefined;
@@ -18,10 +18,10 @@ export const Checkout: React.FC = () => {
   const [formData, setFormData] = useState({
     companyName: '',
     email: '',
-    cardName: '',
-    cardNumber: ''
+    firstName: '',
+    lastName: ''
   });
-  
+
   const [paymentMethod, setPaymentMethod] = useState<'Card' | 'Invoice'>(state?.paymentMethod || 'Card');
   const { process, processing, result } = useCheckout();
 
@@ -44,6 +44,8 @@ export const Checkout: React.FC = () => {
       user: {
         email: formData.email,
         companyName: formData.companyName,
+        firstName: formData.firstName,
+        lastName: formData.lastName,
         isNonProfit: state.isNonProfit
       },
       tier: state.tier,
@@ -51,7 +53,12 @@ export const Checkout: React.FC = () => {
       paymentMethod
     };
 
-    await process(payload);
+    const res = await process(payload);
+
+    // SEC-1: Handle Stripe Redirect
+    if (res?.status === 'success' && res.checkoutUrl) {
+      window.location.href = res.checkoutUrl;
+    }
   };
 
   if (result?.status === 'success') {
@@ -60,10 +67,10 @@ export const Checkout: React.FC = () => {
         <div className="mx-auto flex items-center justify-center h-24 w-24 rounded-full bg-green-100 mb-8 shadow-2xl ring-8 ring-green-50">
           <CheckCircle className="h-12 w-12 text-green-600" />
         </div>
-        
+
         <h2 className="text-4xl font-serif font-black text-chamber-navy mb-4 tracking-tight">Welcome to {state.chamberName}!</h2>
         <p className="text-slate-500 text-lg mb-12 font-medium">Your application for the <span className="text-slate-900 font-bold">{state.tier}</span> tier has been processed.</p>
-        
+
         {result.membership_status === 'Provisional' ? (
           <div className="bg-white border border-slate-200 rounded-[32px] p-10 mb-12 shadow-xl">
             <div className="inline-flex items-center gap-2 px-4 py-1.5 bg-indigo-50 text-indigo-700 rounded-full text-xs font-black uppercase tracking-widest mb-6">
@@ -76,7 +83,7 @@ export const Checkout: React.FC = () => {
           </div>
         ) : (
           <div className="bg-white border border-slate-200 rounded-[32px] p-10 mb-12 shadow-xl">
-             <div className="inline-flex items-center gap-2 px-4 py-1.5 bg-amber-50 text-amber-700 rounded-full text-xs font-black uppercase tracking-widest mb-6">
+            <div className="inline-flex items-center gap-2 px-4 py-1.5 bg-amber-50 text-amber-700 rounded-full text-xs font-black uppercase tracking-widest mb-6">
               Invoice Issued
             </div>
             <h3 className="text-2xl font-bold text-slate-900 mb-4 tracking-tight">Awaiting Payment</h3>
@@ -103,7 +110,7 @@ export const Checkout: React.FC = () => {
           <h1 className="text-4xl font-serif font-black text-slate-900 tracking-tight">Review & Pay</h1>
           <p className="text-slate-500">Secure checkout for {state.chamberName} membership.</p>
         </header>
-        
+
         <div className="bg-white shadow-2xl rounded-[32px] overflow-hidden mb-10 border border-slate-100">
           <div className="px-8 py-6 bg-slate-50/80 border-b border-slate-100 flex justify-between items-center">
             <h3 className="font-bold text-slate-900 uppercase tracking-widest text-xs">Membership Summary</h3>
@@ -135,13 +142,35 @@ export const Checkout: React.FC = () => {
             </h4>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div>
+                <label className="block text-xs font-bold text-slate-400 uppercase tracking-widest mb-2">First Name</label>
+                <input
+                  type="text"
+                  required
+                  placeholder="John"
+                  value={formData.firstName}
+                  onChange={e => setFormData({ ...formData, firstName: e.target.value })}
+                  className="w-full bg-slate-50 border-none rounded-2xl py-4 px-5 focus:ring-1 focus:ring-chamber-gold outline-none text-slate-900 placeholder-slate-300"
+                />
+              </div>
+              <div>
+                <label className="block text-xs font-bold text-slate-400 uppercase tracking-widest mb-2">Last Name</label>
+                <input
+                  type="text"
+                  required
+                  placeholder="Doe"
+                  value={formData.lastName}
+                  onChange={e => setFormData({ ...formData, lastName: e.target.value })}
+                  className="w-full bg-slate-50 border-none rounded-2xl py-4 px-5 focus:ring-1 focus:ring-chamber-gold outline-none text-slate-900 placeholder-slate-300"
+                />
+              </div>
+              <div>
                 <label className="block text-xs font-bold text-slate-400 uppercase tracking-widest mb-2">Company Name</label>
                 <input
                   type="text"
                   required
                   placeholder="ACME Corp"
                   value={formData.companyName}
-                  onChange={e => setFormData({...formData, companyName: e.target.value})}
+                  onChange={e => setFormData({ ...formData, companyName: e.target.value })}
                   className="w-full bg-slate-50 border-none rounded-2xl py-4 px-5 focus:ring-1 focus:ring-chamber-gold outline-none text-slate-900 placeholder-slate-300"
                 />
               </div>
@@ -152,7 +181,7 @@ export const Checkout: React.FC = () => {
                   required
                   placeholder="billing@acme.com"
                   value={formData.email}
-                  onChange={e => setFormData({...formData, email: e.target.value})}
+                  onChange={e => setFormData({ ...formData, email: e.target.value })}
                   className="w-full bg-slate-50 border-none rounded-2xl py-4 px-5 focus:ring-1 focus:ring-chamber-gold outline-none text-slate-900 placeholder-slate-300"
                 />
               </div>
@@ -181,40 +210,6 @@ export const Checkout: React.FC = () => {
             </div>
           </div>
 
-          {paymentMethod === 'Card' && (
-            <div className="space-y-6 animate-in fade-in slide-in-from-top-2 duration-300 bg-slate-50 p-6 rounded-2xl">
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                <div className="md:col-span-3">
-                  <label className="block text-xs font-bold text-slate-400 uppercase tracking-widest mb-2">Cardholder Name</label>
-                  <input
-                    type="text"
-                    placeholder="Full Name"
-                    value={formData.cardName}
-                    onChange={e => setFormData({...formData, cardName: e.target.value})}
-                    className="w-full bg-white border-none rounded-xl py-3 px-4 focus:ring-1 focus:ring-chamber-gold outline-none text-slate-900 placeholder-slate-300"
-                  />
-                </div>
-                <div className="md:col-span-2">
-                  <label className="block text-xs font-bold text-slate-400 uppercase tracking-widest mb-2">Card Number</label>
-                  <input
-                    type="text"
-                    placeholder="0000 0000 0000 0000"
-                    value={formData.cardNumber}
-                    onChange={e => setFormData({...formData, cardNumber: e.target.value})}
-                    className="w-full bg-white border-none rounded-xl py-3 px-4 focus:ring-1 focus:ring-chamber-gold outline-none text-slate-900 placeholder-slate-300"
-                  />
-                </div>
-                <div>
-                  <label className="block text-xs font-bold text-slate-400 uppercase tracking-widest mb-2">CVC</label>
-                  <input
-                    type="text"
-                    placeholder="123"
-                    className="w-full bg-white border-none rounded-xl py-3 px-4 focus:ring-1 focus:ring-chamber-gold outline-none text-slate-900 placeholder-slate-300"
-                  />
-                </div>
-              </div>
-            </div>
-          )}
 
           <div className="pt-8 border-t border-slate-100">
             <button
@@ -235,8 +230,8 @@ export const Checkout: React.FC = () => {
               )}
             </button>
             <p className="mt-6 text-center text-xs font-bold text-slate-400 uppercase tracking-widest">
-              {paymentMethod === 'Card' 
-                ? "Secure SSL Encryption Enabled. Automatic Renewal Annualy." 
+              {paymentMethod === 'Card'
+                ? "Secure SSL Encryption Enabled. Automatic Renewal Annualy."
                 : "Payment due within 30 days of invoice receipt."}
             </p>
           </div>
