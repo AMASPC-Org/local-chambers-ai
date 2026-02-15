@@ -173,6 +173,34 @@ class BackendAgent {
     console.log('[BackendAgent] Re-Initialized with schema config:', JSON.stringify(this.config, null, 2));
   }
 
+  private get baseUrl(): string {
+    const env = (import.meta as any).env;
+    return env?.VITE_AMA_API_URL || process.env.VITE_AMA_API_URL || 'http://localhost:8080';
+  }
+
+  private async apiCall<T>(endpoint: string, options: RequestInit = {}): Promise<T> {
+    const url = `${this.baseUrl}${endpoint}`;
+    try {
+      const response = await fetch(url, {
+        ...options,
+        headers: {
+          'Content-Type': 'application/json',
+          ...options.headers,
+        },
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({ error: 'Unknown API error' }));
+        throw new Error(errorData.error || errorData.message || `API error: ${response.status}`);
+      }
+
+      return await response.json();
+    } catch (e: any) {
+      console.error(`[BackendAgent] API Call Failed [${endpoint}]:`, e);
+      throw e;
+    }
+  }
+
   public static getInstance(config?: Partial<SchemaConfig>): BackendAgent {
     if (!BackendAgent.instance) {
       BackendAgent.instance = new BackendAgent(config);
@@ -310,26 +338,30 @@ class BackendAgent {
   }
 
   async loginUser(payload: LoginPayload): Promise<AuthResponse> {
-    const { loginUser } = await import('../../services/gasShim');
-    return loginUser(payload);
+    return this.apiCall<AuthResponse>('/api/auth/login', {
+      method: 'POST',
+      body: JSON.stringify(payload)
+    });
   }
 
   async registerUser(payload: SignUpPayload): Promise<AuthResponse> {
-    const { registerUser } = await import('../../services/gasShim');
-    return registerUser(payload);
+    return this.apiCall<AuthResponse>('/api/auth/register', {
+      method: 'POST',
+      body: JSON.stringify(payload)
+    });
   }
 
   // -----------------------------------------------------------------------
   // Real Firebase Auth Implementation
   // -----------------------------------------------------------------------
 
-  private mapFirebaseUserToUser(user: FirebaseUser): any {
+  private mapFirebaseUserToUser(user: FirebaseUser): UserProfile {
     return {
       id: user.uid,
       email: user.email || '',
       firstName: user.displayName?.split(' ')[0] || '',
       lastName: user.displayName?.split(' ').slice(1).join(' ') || '',
-      companyName: '', // Populated later or via registration
+      companyName: '',
       isNonProfit: false,
     };
   }
@@ -373,11 +405,26 @@ class BackendAgent {
   async register(payload: SignUpPayload) { return this.registerUser(payload); }
 
   async processMembership(payload: MembershipPayload): Promise<TransactionResult> {
-    const { processMembership } = await import('../../services/gasShim');
-    return processMembership(payload);
+    if (payload.paymentMethod === 'Card') {
+      return this.apiCall<TransactionResult>('/api/checkout/create-session', {
+        method: 'POST',
+        body: JSON.stringify(payload)
+      });
+    }
+
+    // Invoice flow
+    return this.apiCall<TransactionResult>('/api/memberships/enroll', {
+      method: 'POST',
+      body: JSON.stringify(payload)
+    });
   }
 
-  async processCheckout(payload: MembershipPayload) { return this.processMembership(payload); }
+  /**
+   * Alias for processMembership for useCheckout hook
+   */
+  async processCheckout(payload: any): Promise<TransactionResult> {
+    return this.processMembership(payload);
+  }
 
 
 
@@ -402,34 +449,38 @@ class BackendAgent {
   }
 
   async verifyOTP(email: string, code: string) {
-    const { verifyOTP } = await import('../../services/gasShim');
-    return { status: await verifyOTP(code) ? 'success' : 'error' };
+    return this.apiCall<{ status: string }>('/api/auth/verify-otp', {
+      method: 'POST',
+      body: JSON.stringify({ email, code })
+    });
   }
 
   async getMembersByChamberId(chamberId: string) {
-    const { getPendingMembers } = await import('../../services/gasShim');
-    return getPendingMembers(chamberId);
+    return this.apiCall<any[]>(`/api/memberships/pending?chamberId=${chamberId}`);
   }
 
   async approveMember(memberId: string) {
-    const { approveMember } = await import('../../services/gasShim');
-    return approveMember(memberId);
+    return this.apiCall<any>('/api/memberships/approve', {
+      method: 'POST',
+      body: JSON.stringify({ memberId })
+    });
   }
 
   async saveProduct(product: ChamberProduct | Omit<ChamberProduct, 'id'>) {
-    const { saveChamberProduct } = await import('../../services/gasShim');
-    return saveChamberProduct(product as any);
+    return this.apiCall<any>('/api/products', {
+      method: 'POST',
+      body: JSON.stringify(product)
+    });
   }
 
   async deleteProduct(id: string) {
-    const { deleteChamberProduct } = await import('../../services/gasShim');
-    return deleteChamberProduct(id);
+    return this.apiCall<any>(`/api/products/${id}`, {
+      method: 'DELETE'
+    });
   }
 
   async getAISuggestions(name: string) {
-    const { generateAISuggestions } = await import('../../services/gasShim');
-    const tiers = await generateAISuggestions(name, 'Default Region');
-    return { description: tiers[0]?.description ?? '', services: tiers[0]?.benefits ?? [] };
+    return this.apiCall<{ description: string, services: string[] }>(`/api/ai/suggestions?name=${encodeURIComponent(name)}`);
   }
 
   // -----------------------------------------------------------------------
