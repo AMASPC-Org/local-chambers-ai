@@ -51,3 +51,13 @@ build_error.log
 *.rules.bak
 credentials/
 .antigravity/
+# Agent artifacts
+.agent/
+.gemini/
+CONTEXT.md
+
+# Build output
+.next/
+dist/
+node_modules/
+*.log
